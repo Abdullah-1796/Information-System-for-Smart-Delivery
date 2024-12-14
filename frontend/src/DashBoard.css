@@ -1,0 +1,115 @@
+/* Dashboard.css */
+
+.dashboard {
+    display: flex;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+  }
+  
+  .sidebar {
+    width: 250px;
+    background-color: #333;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    transition: width 0.3s ease;
+  }
+  
+  .sidebar.collapsed {
+    width: 60px;
+  }
+  
+  .sidebar-title {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 18px;
+    transition: opacity 0.3s;
+  }
+  
+  .sidebar-menu {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 20px;
+  }
+  
+  .sidebar-menu li {
+    margin: 15px 0;
+    cursor: pointer;
+    color: #bbb;
+    transition: color 0.3s, opacity 0.3s;
+  }
+  
+  .sidebar-menu li:hover {
+    color: #fff;
+  }
+  
+  .sidebar.collapsed .sidebar-title,
+  .sidebar.collapsed .sidebar-menu li {
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  .toggle-button {
+    background-color: #444;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    padding: 5px 10px;
+    font-size: 16px;
+    margin-bottom: 10px;
+    align-self: flex-end;
+  }
+  
+  .main-content {
+    flex: 1;
+    background-color: #f9f9f9;
+    padding: 20px;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  
+  .stat-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .stat-card .icon {
+    font-size: 40px;
+    color: #007bff;
+    margin-bottom: 10px;
+  }
+  
+  .stat-card .details h3 {
+    font-size: 32px;
+    margin: 0;
+    color: #333;
+  }
+  
+  .stat-card .details p {
+    color: #666;
+    margin: 5px 0 0;
+    font-size: 16px;
+  }
+  
