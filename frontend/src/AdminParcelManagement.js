@@ -3,7 +3,9 @@ import './App.css'; // Import the CSS file
 
 const AdminParcelManagement = () => {
   const [parcels, setParcels] = useState([]); // State to hold parcel data
-  const [selectedParcels, setSelectedParcels] = useState([]); // State to hold selected parcels for delivery boxes
+  const [assignedRiders, setAssignedRiders] = useState({}); // State to hold rider assignments
+  const [currentPage, setCurrentPage] = useState(1); // Current page state
+  const parcelsPerPage = 50; // Number of parcels per page
 
   useEffect(() => {
     // Populate with dummy data for now
@@ -12,32 +14,46 @@ const AdminParcelManagement = () => {
       sender: `Sender ${index + 1}`,
       receiver: `Receiver ${index + 1}`,
       status: 'Pending',
-      city: "Lahore",
-      Province:"Punjab",
+      city: ["Lahore", "Karachi", "Islamabad", "Peshawar", "Quetta"][Math.floor(Math.random() * 5)],
+      area: ["Model Town", "Gulberg", "DHA", "Johar Town", "Cantt"][Math.floor(Math.random() * 5)],
+      subArea: ["A Block", "B Block", "C Block", "D Block", "E Block"][Math.floor(Math.random() * 5)],
       charges: Math.floor(Math.random() * (150 - 100 + 1)) + 100,
     }));
     setParcels(dummyParcels);
   }, []);
 
-  const handleSelectParcel = (parcelId) => {
-    setSelectedParcels((prevSelected) => {
-      if (prevSelected.includes(parcelId)) {
-        return prevSelected.filter((id) => id !== parcelId);
-      } else {
-        return [...prevSelected, parcelId];
-      }
-    });
+  const ridersForSubArea = {
+    Lahore: {
+      "Model Town": ["Rider A1", "Rider A2"],
+      "Gulberg": ["Rider B1", "Rider B2"],
+      "DHA": ["Rider C1", "Rider C2"],
+    },
+    Karachi: {
+      "Model Town": ["Rider K1", "Rider K2"],
+      "Gulberg": ["Rider K3", "Rider K4"],
+      "DHA": ["Rider K5", "Rider K6"],
+    },
   };
 
-  const handleAssignToDeliveryBox = async () => {
-    try {
-      // Simulate API call
-      alert(`Parcels assigned to delivery boxes: ${selectedParcels.join(', ')}`);
-      setSelectedParcels([]); // Clear the selection
-    } catch (error) {
-      console.error('Error assigning parcels:', error);
-    }
+  const handleAssignRider = (parcelId, rider) => {
+    setAssignedRiders((prev) => ({
+      ...prev,
+      [parcelId]: rider,
+    }));
   };
+
+  // Calculate the parcels to display based on the current page
+  const indexOfLastParcel = currentPage * parcelsPerPage;
+  const indexOfFirstParcel = indexOfLastParcel - parcelsPerPage;
+  const currentParcels = parcels.slice(indexOfFirstParcel, indexOfLastParcel);
+
+  // Handle page change
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  // Calculate total pages
+  const totalPages = Math.ceil(parcels.length / parcelsPerPage);
 
   return (
     <div className="admin-parcel-management">
@@ -46,45 +62,68 @@ const AdminParcelManagement = () => {
       <table className="parcel-table">
         <thead>
           <tr>
-            <th>Select</th>
             <th>Parcel ID</th>
             <th>Sender</th>
             <th>Receiver</th>
+            <th>City</th>
+            <th>Area</th>
+            <th>Sub Area</th>
             <th>Status</th>
             <th>Charges</th>
+            <th>Assign Rider</th>
           </tr>
         </thead>
         <tbody>
-          {parcels.map((parcel) => (
-            <tr
-              key={parcel.id}
-              className={selectedParcels.includes(parcel.id) ? 'selected-row' : ''}
-              onClick={() => handleSelectParcel(parcel.id)}
-            >
-              <td>
-                <input
-                  type="checkbox"
-                  checked={selectedParcels.includes(parcel.id)}
-                  readOnly
-                />
-              </td>
+          {currentParcels.map((parcel) => (
+            <tr key={parcel.id}>
               <td>{parcel.id}</td>
               <td>{parcel.sender}</td>
               <td>{parcel.receiver}</td>
+              <td>{parcel.city}</td>
+              <td>{parcel.area}</td>
+              <td>{parcel.subArea}</td>
               <td>{parcel.status}</td>
               <td>{parcel.charges}</td>
+              <td>
+                <select
+                  value={assignedRiders[parcel.id] || ""}
+                  onChange={(e) => handleAssignRider(parcel.id, e.target.value)}
+                >
+                  <option value="" disabled>Select Rider</option>
+                  {(ridersForSubArea[parcel.city]?.[parcel.area] || []).map((rider) => (
+                    <option key={rider} value={rider}>{rider}</option>
+                  ))}
+                </select>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      <button
-        className="assign-button"
-        onClick={handleAssignToDeliveryBox}
-        disabled={selectedParcels.length === 0}
-      >
-        Assign to Delivery Box
-      </button>
+      {/* Pagination Controls */}
+      <div className="pagination">
+        <button 
+          onClick={() => handlePageChange(currentPage - 1)} 
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        {[...Array(totalPages).keys()].map((page) => (
+          <button 
+            key={page + 1} 
+            onClick={() => handlePageChange(page + 1)} 
+            className={currentPage === page + 1 ? 'active' : ''}
+          >
+            {page + 1}
+          </button>
+        ))}
+        <button 
+          onClick={() => handlePageChange(currentPage + 1)} 
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };
