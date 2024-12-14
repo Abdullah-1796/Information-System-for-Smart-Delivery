@@ -42,6 +42,8 @@
   text-align: center;
   color: #333;
   margin-bottom: 20px;
+  justify-content: "center";
+  align-items: "center";
 }
 
 .parcel-table {
@@ -74,7 +76,7 @@
   width: 200px;
   margin: 0 auto;
   padding: 10px 20px;
-  background-color: #4caf50;
+  background-color: #007bff;
   color: white;
   border: none;
   border-radius: 5px;
@@ -107,6 +109,22 @@
   font-weight: bold;
   background-color: #007bff;
   color: white;
+}
+.assign-button {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.assign-button button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.assign-button button:hover {
+  background-color: #0056b3;
 }
 
 /* Add hover effect for rows */
