@@ -1,5 +1,6 @@
 import React from "react";
 import axios from "axios";
+import "../styles/AdminHome.css";
 
 function AdminHome() {
     const [data, setData] = React.useState([
@@ -46,9 +47,9 @@ function AdminHome() {
     }
 
     return (
-        <div>
-            <button onClick={postUpdates}>Post Updates</button>
-            <button onClick={getUpdates}>Get Updates</button>
+        <div id="adminHomeBody">
+            <button onClick={postUpdates} className="adminButton">Post Updates</button>
+            <button onClick={getUpdates} className="adminButton">Get Updates</button>
         </div>
     );
 }
