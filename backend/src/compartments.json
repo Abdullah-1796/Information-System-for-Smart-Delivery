@@ -1,0 +1,264 @@
+{
+  "deliveryBoxes": [
+    {
+      "id": "box_001",
+      "location": {
+        "latitude": 31.5204,
+        "longitude": 74.3587,
+        "address": "Liberty Market, Lahore"
+      },
+      "surroundingLocations": [
+        { "latitude": 31.5210, "longitude": 74.3590 },
+        { "latitude": 31.5202, "longitude": 74.3580 }
+      ],
+      "compartments": [
+        {
+          "id": "comp_001",
+          "size": "small",
+          "status": "available",
+          "doorStatus": "closed"
+        },
+        {
+          "id": "comp_002",
+          "size": "medium",
+          "status": "acquired",
+          "doorStatus": "closed"
+        }
+      ]
+    },
+    {
+      "id": "box_002",
+      "location": {
+        "latitude": 31.5546,
+        "longitude": 74.3572,
+        "address": "Mall Road, Lahore"
+      },
+      "surroundingLocations": [
+        { "latitude": 31.5550, "longitude": 74.3575 },
+        { "latitude": 31.5540, "longitude": 74.3565 }
+      ],
+      "compartments": [
+        {
+          "id": "comp_003",
+          "size": "large",
+          "status": "available",
+          "doorStatus": "closed"
+        },
+        {
+          "id": "comp_004",
+          "size": "small",
+          "status": "available",
+          "doorStatus": "opened"
+        }
+      ]
+    },
+    {
+      "id": "box_003",
+      "location": {
+        "latitude": 31.4779,
+        "longitude": 74.2937,
+        "address": "Johar Town, Lahore"
+      },
+      "surroundingLocations": [
+        { "latitude": 31.4785, "longitude": 74.2940 },
+        { "latitude": 31.4770, "longitude": 74.2930 }
+      ],
+      "compartments": [
+        {
+          "id": "comp_005",
+          "size": "medium",
+          "status": "acquired",
+          "doorStatus": "closed"
+        },
+        {
+          "id": "comp_006",
+          "size": "large",
+          "status": "available",
+          "doorStatus": "closed"
+        }
+      ]
+    },
+    {
+      "id": "box_004",
+      "location": {
+        "latitude": 31.5820,
+        "longitude": 74.3294,
+        "address": "Gulberg, Lahore"
+      },
+      "surroundingLocations": [
+        { "latitude": 31.5825, "longitude": 74.3300 },
+        { "latitude": 31.5815, "longitude": 74.3285 }
+      ],
+      "compartments": [
+        {
+          "id": "comp_007",
+          "size": "small",
+          "status": "available",
+          "doorStatus": "closed"
+        },
+        {
+          "id": "comp_008",
+          "size": "medium",
+          "status": "acquired",
+          "doorStatus": "closed"
+        }
+      ]
+    },
+    {
+      "id": "box_005",
+      "location": {
+        "latitude": 31.5657,
+        "longitude": 74.3142,
+        "address": "DHA Phase 5, Lahore"
+      },
+      "surroundingLocations": [
+        { "latitude": 31.5660, "longitude": 74.3150 },
+        { "latitude": 31.5650, "longitude": 74.3135 }
+      ],
+      "compartments": [
+        {
+          "id": "comp_009",
+          "size": "large",
+          "status": "available",
+          "doorStatus": "opened"
+        },
+        {
+          "id": "comp_010",
+          "size": "small",
+          "status": "acquired",
+          "doorStatus": "closed"
+        }
+      ]
+    },
+    {
+      "id": "box_006",
+      "location": {
+        "latitude": 31.5123,
+        "longitude": 74.3441,
+        "address": "Model Town, Lahore"
+      },
+      "surroundingLocations": [
+        { "latitude": 31.5130, "longitude": 74.3445 },
+        { "latitude": 31.5115, "longitude": 74.3435 }
+      ],
+      "compartments": [
+        {
+          "id": "comp_011",
+          "size": "medium",
+          "status": "available",
+          "doorStatus": "closed"
+        },
+        {
+          "id": "comp_012",
+          "size": "small",
+          "status": "acquired",
+          "doorStatus": "closed"
+        }
+      ]
+    },
+    {
+      "id": "box_007",
+      "location": {
+        "latitude": 31.5882,
+        "longitude": 74.3510,
+        "address": "Cantt, Lahore"
+      },
+      "surroundingLocations": [
+        { "latitude": 31.5890, "longitude": 74.3515 },
+        { "latitude": 31.5875, "longitude": 74.3505 }
+      ],
+      "compartments": [
+        {
+          "id": "comp_013",
+          "size": "large",
+          "status": "available",
+          "doorStatus": "closed"
+        },
+        {
+          "id": "comp_014",
+          "size": "medium",
+          "status": "acquired",
+          "doorStatus": "closed"
+        }
+      ]
+    },
+    {
+      "id": "box_008",
+      "location": {
+        "latitude": 31.4654,
+        "longitude": 74.3750,
+        "address": "Wapda Town, Lahore"
+      },
+      "surroundingLocations": [
+        { "latitude": 31.4660, "longitude": 74.3755 },
+        { "latitude": 31.4645, "longitude": 74.3745 }
+      ],
+      "compartments": [
+        {
+          "id": "comp_015",
+          "size": "small",
+          "status": "available",
+          "doorStatus": "closed"
+        },
+        {
+          "id": "comp_016",
+          "size": "large",
+          "status": "acquired",
+          "doorStatus": "closed"
+        }
+      ]
+    },
+    {
+      "id": "box_009",
+      "location": {
+        "latitude": 31.5147,
+        "longitude": 74.3722,
+        "address": "Iqbal Town, Lahore"
+      },
+      "surroundingLocations": [
+        { "latitude": 31.5150, "longitude": 74.3725 },
+        { "latitude": 31.5140, "longitude": 74.3715 }
+      ],
+      "compartments": [
+        {
+          "id": "comp_017",
+          "size": "medium",
+          "status": "available",
+          "doorStatus": "opened"
+        },
+        {
+          "id": "comp_018",
+          "size": "small",
+          "status": "acquired",
+          "doorStatus": "closed"
+        }
+      ]
+    },
+    {
+      "id": "box_010",
+      "location": {
+        "latitude": 31.5750,
+        "longitude": 74.3167,
+        "address": "Garden Town, Lahore"
+      },
+      "surroundingLocations": [
+        { "latitude": 31.5760, "longitude": 74.3170 },
+        { "latitude": 31.5745, "longitude": 74.3160 }
+      ],
+      "compartments": [
+        {
+          "id": "comp_019",
+          "size": "large",
+          "status": "available",
+          "doorStatus": "closed"
+        },
+        {
+          "id": "comp_020",
+          "size": "medium",
+          "status": "acquired",
+          "doorStatus": "closed"
+        }
+      ]
+    }
+  ]
+}
