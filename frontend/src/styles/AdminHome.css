@@ -1,0 +1,15 @@
+#adminHomeBody {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #DFF2EB;
+}
+
+.adminButton {
+    width: 20%;
+    height: 20%;
+    border-radius: 25px;
+    margin: 5%;
+    font-size: 20px;
+}

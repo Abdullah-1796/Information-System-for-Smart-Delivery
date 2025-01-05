@@ -21,7 +21,7 @@ const db = new pg.Client({
 
 db.connect((err) => {
     if (err) {
-        console.error('Error connecting to postgres database: ');
+        console.error('Error connecting to postgres database: ', err);
         return;
     }
     console.log('Connected to postgres database');
