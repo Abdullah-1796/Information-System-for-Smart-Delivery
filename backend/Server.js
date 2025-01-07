@@ -81,18 +81,26 @@ const parcels = [
   ];
   
   // Endpoint to get parcel details by parcel ID
-  app.get('/api/parcel/:id', (req, res) => {
-    const parcelId = req.params.id;
-    
-    // Find the parcel by ID
-    const parcel = parcels.find(p => p.id === parcelId);
-  
-    if (parcel) {
-      res.status(200).json(parcel);
-    } else {
-      res.status(404).json({ message: "Parcel not found" });
+  app.get('/api/parcel/:id', async (req, res) => {
+    const parcelId = req.params.id; // Get the parcel ID from the request parameters
+
+    try {
+        // Query the database for the parcel with the given ID
+        const query = "SELECT * FROM parcelForDelivery WHERE parcelid = $1";
+        const result = await db.query(query, [parcelId]);
+
+        // Check if a parcel was found
+        if (result.rows.length > 0) {
+            res.status(200).json(result.rows[0]); // Return the first (and only) matching parcel
+        } else {
+            res.status(404).json({ message: "Parcel not found" }); // Parcel not found
+        }
+    } catch (error) {
+        console.error("Error while fetching parcel:", error.message);
+        res.status(500).json({ message: "Error while fetching parcel: " + error.message }); // Internal server error
     }
-  });
+});
+
 app.post('/postUpdates', async (req, res) => {
     const data = req.body;
     const query = `insert into parcelForDelivery(itemName, sname, sphone, semail, rname, rphone, remail, dimensionID, receiverTrackingID, riderTrackingID) values

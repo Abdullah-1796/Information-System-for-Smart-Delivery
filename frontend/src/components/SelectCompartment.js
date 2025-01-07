@@ -9,26 +9,21 @@ const SelectCompartment = () => {
   const [deliveryBoxes, setDeliveryBoxes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [parcelDetail, setParcelDetail] = useState({
-    id: "1",
-    size: "medium",
-    weight: "2kg",
-    location: {
-      address: "Location A",
-      latitude: 37.78825,
-      longitude: -122.4324,
-    },
-    receiver: {
-      name: "John Doe",
-      contact: "123-456-7890",
-      email: "johndoe@example.com",
-    },
-    status: "Pending",
-    deliveryDate: "2025-01-10",
+    "parcelid": 3,
+    "itemname": "AKG Handfree",
+    "sname": "Mario",
+    "sphone": "03000000000",
+    "semail": "stest1@gmail.com",
+    "rname": "John William",
+    "rphone": "03110000000",
+    "remail": "rtest1@gmail.com",
+    "dimensionid": "small",
+    "receivertrackingid": "123456",
+    "ridertrackingid": "123456",
+    "lockerid": null,
+    "creationtime": "2024-12-18T07:32:17.877Z"
   });
   
-  const [mapCenter, setMapCenter] = useState({ lat: 37.78825, lng: -122.4324 }); // Default center of the map
-  const [markerPosition, setMarkerPosition] = useState({ lat: 37.78825, lng: -122.4324 }); // Default marker position
-
   useEffect(() => {
     axios
       .get("http://localhost:4001/api/delivery-boxes")
@@ -41,13 +36,6 @@ const SelectCompartment = () => {
         setLoading(false);
       });
   }, []);
-
-  const handleMapClick = (e) => {
-    const lat = e.latLng.lat();
-    const lng = e.latLng.lng();
-    setMarkerPosition({ lat, lng });
-    setMapCenter({ lat, lng });
-  };
 
   const getParceldetail = () => {
     if (!parcelTrackingID) {
@@ -70,10 +58,6 @@ const SelectCompartment = () => {
       });
   };
 
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: "YOUR_GOOGLE_MAPS_API_KEY", // Replace with your API key
-  });
-
   return (
     <div style={{ padding: "16px" }}>
       <div
@@ -88,7 +72,7 @@ const SelectCompartment = () => {
         <h2>Select a Delivery Compartment</h2>
         {parcelDetail && (
           <h3>
-            ParcelID: {parcelDetail.id} is {parcelDetail.size}
+            ParcelID: {parcelDetail.parcelid} is {parcelDetail.dimensionid}
           </h3>
         )}
         <button onClick={() => console.log("Help")}>?</button>
@@ -163,7 +147,7 @@ const SelectCompartment = () => {
               .includes(searchQuery.toLowerCase()) ||
             box.compartments.some(
               (compartment) =>
-                compartment.size === parcelDetail.size &&
+                compartment.size === parcelDetail.dimensionid &&
                 compartment.status === "available" &&
                 compartment.name.toLowerCase().includes(searchQuery.toLowerCase())
             )
@@ -188,7 +172,7 @@ const SelectCompartment = () => {
                 {box.compartments
                   .filter(
                     (compartment) =>
-                      compartment.size === parcelDetail.size &&
+                      compartment.size === parcelDetail.dimensionid &&
                       compartment.status === "available" &&
                       (!searchQuery ||
                         compartment.name.toLowerCase().includes(searchQuery.toLowerCase()))
