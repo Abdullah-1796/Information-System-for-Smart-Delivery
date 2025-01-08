@@ -5,6 +5,7 @@ import bodyParser from "body-parser";
 import fs from 'fs';
 import path from "path";
 import twilio from "twilio";
+import axios from "axios";
 
 
 const port = 4001;
@@ -129,6 +130,63 @@ app.get('/getUpdates', async (req, res) => {
     }
 });
 
+app.get('/availableLockers', async (req, res) => {
+    const trackingID = req.query.trackingID;
+    const query = "select address, city, dimensionID from parcelForDelivery where receiverTrackingID='" + trackingID + "'";
+    let address, city, dimensionID;
+    try {
+        const result = await db.query(query);
+        address = result.rows[0].address;
+        city = result.rows[0].city;
+        dimensionID = result.rows[0].dimensionid;
+    }
+    catch (error) {
+        res.status(500).send({message: "Error1 while fetching available Lockers: " + error.message});
+    }
+    
+    console.log(address, city, dimensionID);
+    const query1 = "select d.lockerID, d.address, d.city, compCategoryID from deliveryBox d inner join compartment c on d.lockerID=c.lockerID where d.address='" + address + "' and d.city='" + city +"' and c.compCategoryID=" + dimensionID + " and c.compStateID=1 group by d.lockerID, compCategoryID";
+
+    try {
+        const result = await db.query(query1);
+        res.status(200).send(result);
+    }
+    catch (error) {
+        res.status(500).send({message: "Error2 while fetching available Lockers: " + error.message});
+    }
+});
+
+app.post('/reserveLocker', async (req, res) => {
+    const lockerID = req.body.lockerID;
+    const compCategoryID = req.body.compCategoryID;
+    console.log(compCategoryID);
+
+    const q = "select compID from compartment where lockerid='" + lockerID + "' and compcategoryid=" + compCategoryID + " order by compid";
+    try {
+        const result = await db.query(q);
+        console.log(result.rows);
+        const compid = result.rows[0].compid;
+
+        const values = {
+            lockerid: lockerID,
+            compid: compid,
+            compstateid: 2
+        }
+
+        await axios.put('http://localhost:4002/Locker/Compartment/compstateid', values)
+        .then(response => {
+            console.log(response.data);
+            res.status(200).send({message: "Locker reserved"});
+        })
+        .catch(err => {
+            throw(err);
+        });
+        
+    } catch (error) {
+        res.status(500).send({message: "Error while reserving available Lockers: " + error.message});
+    }
+
+})
 
 //---------------------------------------------------------------------------------------------------
 app.get('/api/delivery-boxes', (req, res) => {
