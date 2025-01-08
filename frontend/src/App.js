@@ -3,6 +3,7 @@ import Dashboard from './DashBoard';
 import './App.css';
 import AdminHome from './components/AdminHome';
 import SelectCompartment from './components/SelectCompartment';
+import SelectLocker from './components/SelectLocker';
 
 function App() {
 	return (
@@ -10,7 +11,8 @@ function App() {
 			{/* <AdminParcelManagement /> */}
 			{/* {<Dashboard/>} */}
 			{/* <AdminHome /> */}
-			<SelectCompartment/>
+			<SelectLocker />
+			{/* <SelectCompartment/> */}
 		</div>
 	);
 }

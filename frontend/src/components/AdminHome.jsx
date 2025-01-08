@@ -10,9 +10,12 @@ function AdminHome() {
             sphone: '03000000000',
             semail: 'stest1@gmail.com',
             rname: 'John William',
-            rphone: '03110000000',
+            rphone: '+923227888444',
             remail: 'rtest1@gmail.com',
-            weight: '20'
+            address: 'Faisal Town A Block',
+            city: 'Lahore',
+            province: 'Punjab',
+            weight: 20
         },
         {
             itemName: 'Leather wallet',
@@ -20,9 +23,12 @@ function AdminHome() {
             sphone: '03000000000',
             semail: 'stest1@gmail.com',
             rname: 'Michal',
-            rphone: '03110000000',
+            rphone: '+923227888444',
             remail: 'rtest1@gmail.com',
-            weight: '100'
+            address: 'Faisal Town A Block',
+            city: 'Lahore',
+            province: 'Punjab',
+            weight: 100
         }
     ]);
     function postUpdates() {
