@@ -52,7 +52,6 @@ function LockerList() {
     }
 
     const handleDelete = () => {
-        console.log("id", selectedLocker);
         axios.delete(`http://localhost:4001/L`, {
             params: { lockerid: selectedLocker },
         })

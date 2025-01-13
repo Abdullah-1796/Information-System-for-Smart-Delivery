@@ -16,11 +16,11 @@ function Locker() {
     // const [id, setID] = React.useState({
     //     "id": lockerid
     // });
-    console.log(id);
+    // console.log(id);
     async function loadData() {
         await axios.get(`http://localhost:4002/Locker/${id}`)
             .then(res => {
-                console.log(res.data.rows);
+                // console.log(res.data.rows);
                 setData(res.data.rows);
                 // console.log(data);
                 //separateData();
@@ -66,6 +66,7 @@ function Locker() {
     const time = 300;
 
     function unhideScreen() {
+        console.log(data[0].lockerid)
         //fading in an image
         $('#interactionScreenBody').fadeIn(time, () => {
             //changing image
@@ -88,6 +89,7 @@ function Locker() {
             <InteractionScreen
                 hideScreen={hideScreen}
                 id={data[0] ? data[0].lockerid : null}
+                loadData={loadData}
             />
 
             <div id="locker">
@@ -108,6 +110,7 @@ function Locker() {
                             compCategory="Small"
                             isLocked={d.islocked.toString()}
                             otp={d.otp}
+                            loadData={loadData}
                         />
                     ))}
                 </div>
@@ -121,6 +124,7 @@ function Locker() {
                             compCategory="Medium"
                             isLocked={d.islocked.toString()}
                             otp={d.otp}
+                            loadData={loadData}
                         />
                     ))}
                 </div>
@@ -134,6 +138,7 @@ function Locker() {
                             compCategory="Large"
                             isLocked={d.islocked.toString()}
                             otp={d.otp}
+                            loadData={loadData}
                         />
                     ))}
                 </div>

@@ -205,18 +205,42 @@ app.put("/L", (req, res) => {
 });
 
 app.post("/compartment", (req, res) => {
-  const { size, id } = req.body;
-  console.log(id)
-  // if (size === "small") {
-  //   addcompartment(id, 1, 0, 0)
-  // }
-  // else if (size === "small") {
-  //   addcompartment(id, 0, 1, 0)
-  // }
-  // else {
-  //   addcompartment(insertedId, 0, 0, 1)
-  // }
+  const { selectedType, id, noOfCompartments } = req.body;
+  console.log(selectedType)
+  if (selectedType === "small") {
+    addcompartment(id, noOfCompartments, 0, 0)
+  }
+  else if (selectedType === "medium") {
+    addcompartment(id, 0, noOfCompartments, 0)
+  }
+  else {
+    addcompartment(id, 0, 0, noOfCompartments)
+  }
+  res.json({message:"Added Successfully"})
 })
+
+app.delete("/compartment", (req, res) => {
+  const lockerId = req.query.lockerid;
+
+  if (!lockerId || isNaN(lockerId)) {
+    return res.status(400).json({ error: "Invalid locker ID" });
+  }
+
+  const query = "DELETE FROM compartment WHERE compid = $1";
+  db.query(query, [lockerId], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: "An error occurred while deleting the locker" });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Locker not found" });
+    }
+
+    return res.status(200).json({ message: "Deleted successfully" });
+  });
+});
+
 function addcompartment(lockerid, noofSmall, noofMedium, noofLarge) {
   // Define the base query for inserting a new compartment
   const query = `
@@ -224,36 +248,39 @@ function addcompartment(lockerid, noofSmall, noofMedium, noofLarge) {
     VALUES ($1, $2, $3, $4, $5) 
   `;
 
-  // Insert small compartments
-  for (let i = 0; i < noofSmall; i++) {
-    db.query(query, [lockerid, 1, 1, true, 0], (err, result) => {
-      if (err) {
-        console.error("Error inserting small compartment:", err);
-      } else {
-        console.log("Inserted small compartment with lockerid:", result.rows[0].lockerid);
-      }
-    });
+  if (noofSmall != 0) {
+    for (let i = 0; i < noofSmall; i++) {
+      db.query(query, [lockerid, 1, 1, true, 0], (err, result) => {
+        if (err) {
+          console.error("Error inserting small compartment:", err);
+        } else {
+          console.log("Inserted small compartment with lockerid:");
+        }
+      });
+    }
   }
 
-  // Insert medium compartments
-  for (let i = 0; i < noofMedium; i++) {
-    db.query(query, [lockerid, 1, 2, true, 0], (err, result) => {
-      if (err) {
-        console.error("Error inserting medium compartment:", err);
-      } else {
-        console.log("Inserted medium compartment with lockerid:", result.rows[0].lockerid);
-      }
-    });
+  if (noofMedium != 0) {
+    for (let i = 0; i < noofMedium; i++) {
+      db.query(query, [lockerid, 1, 2, true, 0], (err, result) => {
+        if (err) {
+          console.error("Error inserting medium compartment:", err);
+        } else {
+          console.log("Inserted medium compartment with lockerid:");
+        }
+      });
+    }
   }
 
-  // Insert large compartments
-  for (let i = 0; i < noofLarge; i++) {
-    db.query(query, [lockerid, 1, 3, true, 0], (err, result) => {
-      if (err) {
-        console.error("Error inserting large compartment:", err);
-      } else {
-        console.log("Inserted large compartment with lockerid:", result.rows[0].lockerid);
-      }
-    });
+  if (noofLarge != 0) {
+    for (let i = 0; i < noofLarge; i++) {
+      db.query(query, [lockerid, 1, 3, true, 0], (err, result) => {
+        if (err) {
+          console.error("Error inserting large compartment:", err);
+        } else {
+          console.log("Inserted large compartment with lockerid:");
+        }
+      });
+    }
   }
 }

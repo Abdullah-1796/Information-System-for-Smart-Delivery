@@ -1,9 +1,24 @@
 import React, { useState } from "react";
 import Modal from "./Modal";
+import axios from "axios";
 import "../styles/Modal.css";
 
 function Compartment(props) {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedComp, setSelectedComp] = useState();
+    const handleDelete = () =>
+    {
+        axios.delete(`http://localhost:4001/compartment`, {
+            params: { lockerid: selectedComp },
+        })
+            .then(res => {
+                console.log("message", res.data.message);
+                props.loadData()
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    }
     return (
         <>
             <div className={props.className + " comp"}>
@@ -12,7 +27,7 @@ function Compartment(props) {
                 <h4>Category: {props.compCategory}</h4>
                 <h4>Is Locked: {props.isLocked}</h4>
                 <h4>OTP: {props.otp}</h4>
-                <button style={{ backgroundColor: "red", color: "white", padding: "10px", borderRadius: "10px" }} onClick={() => setIsModalOpen(true)}>Delete</button>
+                <button style={{ backgroundColor: "red", color: "white", padding: "10px", borderRadius: "10px" }} onClick={() => {setIsModalOpen(true);setSelectedComp(props.compID)}}>Delete</button>
             </div>
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                 <p className="modal_P">Are you sure you want to delete this compartment?</p>
@@ -35,7 +50,7 @@ function Compartment(props) {
                             padding: "0px 20px 0px 20px",
                             borderRadius: "10px",
                         }}
-                        onClick={() => setIsModalOpen(false)}
+                        onClick={() => {setIsModalOpen(false);handleDelete()}}
                     >
                         Yes
                     </button>
