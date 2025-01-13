@@ -1,0 +1,62 @@
+.lockerItem {
+    text-decoration: none;
+}
+.card {
+    background-color: #7AB2D3;
+    padding: 1%;
+    margin: 2%;
+    border-radius: 25px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    font-size: 25px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: self-start;
+    padding-left: 10%;
+    padding-right: 10%;
+    justify-content: center;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15), 0 6px 6px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s linear;
+}
+
+.card:hover {
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
+}
+
+.card p{
+    color: #292F3F;
+}
+
+#Bar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    background-color: rgb(20,47,68);
+    border-radius: 40px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    padding: 10px;
+}
+
+#addressBar > h2 {
+    margin-left: 30px;
+    color: white;
+}
+
+#screenButton {
+    background-color: #B9E5E8;
+    height: 50px;
+    width: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 30px;
+    border-radius: 30px;
+    font-size: 20px;
+    font-weight: bold;
+}
+

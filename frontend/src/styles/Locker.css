@@ -1,0 +1,81 @@
+body {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #DFF2EB;
+    font-family: "Roboto Slab", serif;
+}
+#locker {
+    display: flex;
+    flex-direction: column;
+    margin: 50px;
+    padding: 0;
+    /* filter: blur(5px); */
+}
+
+#addressBar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgb(20,47,68);
+    border-radius: 40px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    margin-bottom: 20px;
+}
+
+#addressBar > h2 {
+    margin-left: 30px;
+    color: white;
+}
+
+#screenButton {
+    background-color: #B9E5E8;
+    height: 50px;
+    width: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 30px;
+    border-radius: 30px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.compartment {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    /* padding: 2%; */
+    margin: 0;
+}
+
+.comp {
+    border-radius: 15px;
+    /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
+
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15), 0 6px 6px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s linear;
+    padding: 3%;
+    margin: 1%;
+    background-color: white;
+}
+
+.comp:hover {
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
+}
+
+.smallCompartment {
+    width: 150px;
+    background-color: #B9E5E8;
+}
+
+.mediumCompartment {
+    width: 300px;
+    background-color: #7AB2D3;
+}
+
+.largeCompartment {
+    width: 500px;
+    background-color: #4A628A;
+}
