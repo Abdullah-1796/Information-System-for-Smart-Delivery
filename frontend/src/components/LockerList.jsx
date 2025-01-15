@@ -164,6 +164,7 @@ function LockerList() {
                             id="small"
                             name="small"
                             required
+                            min="0"
                             value={formData.small}
                             onChange={handleChange}
                             style={{ padding: "10px", borderRadius: "10px" }}
@@ -174,6 +175,7 @@ function LockerList() {
                             id="medium"
                             name="medium"
                             required
+                            min="0"
                             value={formData.medium}
                             onChange={handleChange}
                             style={{ padding: "10px", borderRadius: "10px" }}
@@ -184,6 +186,7 @@ function LockerList() {
                             id="large"
                             name="large"
                             required
+                            min="0"
                             value={formData.large}
                             onChange={handleChange}
                             style={{ padding: "10px", borderRadius: "10px" }}
