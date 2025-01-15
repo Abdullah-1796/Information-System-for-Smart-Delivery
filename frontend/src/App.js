@@ -3,6 +3,7 @@ import Dashboard from './DashBoard';
 import './App.css';
 import AdminHome from './components/AdminHome';
 import SelectCompartment from './components/SelectCompartment';
+<<<<<<< HEAD
 import ManageLockers from './components/adminManageLockers';
 import {
 	BrowserRouter as Router,
@@ -24,6 +25,19 @@ function App() {
 				<Route path="*" element={<Navigate to="/" />} />
 			</Routes>
 		</Router>
+=======
+import SelectLocker from './components/SelectLocker';
+
+function App() {
+	return (
+		<div className="App">
+			{/* <AdminParcelManagement /> */}
+			{/* {<Dashboard/>} */}
+			{/* <AdminHome /> */}
+			<SelectLocker />
+			{/* <SelectCompartment/> */}
+		</div>
+>>>>>>> main
 	);
 }
 

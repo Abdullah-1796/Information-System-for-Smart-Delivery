@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { GoogleMap, LoadScript, Marker, useJsApiLoader } from "@react-google-maps/api";
+// import { GoogleMap, LoadScript, Marker, useJsApiLoader } from "@react-google-maps/api";
 
 const SelectCompartment = () => {
   const [searchQuery, setSearchQuery] = useState("");
