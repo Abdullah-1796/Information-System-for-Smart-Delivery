@@ -149,6 +149,7 @@ app.get('/availableLockers', async (req, res) => {
 
     try {
         const result = await db.query(query1);
+        // console.log(result);
         res.status(200).send(result);
     }
     catch (error) {
@@ -161,7 +162,7 @@ app.post('/reserveLocker', async (req, res) => {
     const compCategoryID = req.body.compCategoryID;
     console.log(compCategoryID);
 
-    const q = "select compID from compartment where lockerid='" + lockerID + "' and compcategoryid=" + compCategoryID + " order by compid";
+    const q = "select compID from compartment where lockerid='" + lockerID + "' and compcategoryid=" + compCategoryID + " and compStateID=1 order by compid";
     try {
         const result = await db.query(q);
         console.log(result.rows);

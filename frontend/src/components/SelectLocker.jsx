@@ -47,8 +47,8 @@ function SelectLocker() {
                 {
                     data.map((d, i) => {
                         return (
-                            <div onClick={() => {reserveLocker(d.lockerid, d.compcategoryid)}}>
-                                <h2>{d.address}</h2>
+                            <div style={{border: "1px solid black", backgroundColor: "lightblue", margin: "10px", borderRadius: "25px", boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)"}} onClick={() => {reserveLocker(d.lockerid, d.compcategoryid)}}>
+                                <h2>{d.address + " " + (i+1)} </h2>
                                 <h3>{d.city}</h3>
                             </div>
                         );

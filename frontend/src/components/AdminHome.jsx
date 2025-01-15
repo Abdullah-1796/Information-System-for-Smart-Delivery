@@ -24,7 +24,7 @@ function AdminHome() {
             semail: 'stest1@gmail.com',
             rname: 'Michal',
             rphone: '+923227888444',
-            remail: 'rtest1@gmail.com',
+            remail: 'rtest2@gmail.com',
             address: 'Faisal Town A Block',
             city: 'Lahore',
             province: 'Punjab',
