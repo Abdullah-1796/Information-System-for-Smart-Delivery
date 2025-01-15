@@ -8,14 +8,9 @@ const Dashboard = () => {
     { label: "Total Branches", value: 3, icon: "🏢" },
     { label: "Total Parcels", value: 3, icon: "📦" },
     { label: "Total Staff", value: 2, icon: "👥" },
-    { label: "Item Accepted by Courier", value: 0, icon: "📦" },
-    { label: "Collected", value: 1, icon: "📦" },
     { label: "Shipped", value: 1, icon: "📦" },
     { label: "In-Transit", value: 0, icon: "📦" },
-    { label: "Arrived At Destination", value: 0, icon: "📦" },
-    { label: "Ready to Pickup", value: 0, icon: "📦" },
     { label: "Delivered", value: 1, icon: "📦" },
-    { label: "Picked-up", value: 0, icon: "📦" },
     { label: "Unsuccessful Delivery Attempt", value: 0, icon: "📦" },
   ];
 
@@ -36,6 +31,7 @@ const Dashboard = () => {
           <li>Parcels</li>
           <li>Track Parcel</li>
           <li>Reports</li>
+          <li>Manage Lockers</li>
         </ul>
       </nav>
       <main className="main-content">
