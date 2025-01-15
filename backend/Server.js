@@ -69,12 +69,15 @@ app.post('/postUpdates', async (req, res) => {
         }
 
         //generating tracking ids
-        let receiverTrackingID = d.rphone + d.sphone + 1;
-        let riderTrackingID = d.rphone + d.sphone + 2;
+        const id = Date.now() + Math.floor(Math.random() * 1000);
+        let receiverTrackingID = id + 1;
+        let riderTrackingID = id + 2;
 
         const message = "Hi, Kindly select your delivery box for your item "+ d.itemName +" with your tracking id " + receiverTrackingID;
 
         //sending message
+
+        const client = twilio(sid, token);
 
         await client.messages
             .create({
@@ -102,10 +105,10 @@ app.post('/postUpdates', async (req, res) => {
         )
     }));
 
-    console.log(values);
+    //console.log(values);
     try {
         const result = await db.query(query, values);
-        console.log(result.rowCount);
+        console.log("rows inserted after SP's post api: "+result.rowCount);
         res.status(200).send({ message: 'Rows Successfully inserted: ' + result.rowCount });
     } catch (error) {
         console.error("Error while insertion: " + error.message);
@@ -132,20 +135,9 @@ app.get('/getUpdates', async (req, res) => {
 
 app.get('/availableLockers', async (req, res) => {
     const trackingID = req.query.trackingID;
-    const query = "select address, city, dimensionID from parcelForDelivery where receiverTrackingID='" + trackingID + "'";
-    let address, city, dimensionID;
-    try {
-        const result = await db.query(query);
-        address = result.rows[0].address;
-        city = result.rows[0].city;
-        dimensionID = result.rows[0].dimensionid;
-    }
-    catch (error) {
-        res.status(500).send({message: "Error1 while fetching available Lockers: " + error.message});
-    }
-    
-    console.log(address, city, dimensionID);
-    const query1 = "select d.lockerID, d.address, d.city, compCategoryID from deliveryBox d inner join compartment c on d.lockerID=c.lockerID where d.address='" + address + "' and d.city='" + city +"' and c.compCategoryID=" + dimensionID + " and c.compStateID=1 group by d.lockerID, compCategoryID";
+
+    //finding and matching lockers with parcel details
+    const query1 = "select l.lockerid, l.compcategoryid, l.address, l.city, l.province, p.itemname, p.sname, p.rname, p.rphone from (select d.lockerid, d.address, d.city, d.province, c.compcategoryid from (select lockerid, compcategoryid from compartment where compstateid = 1 and lockerid is not null group by lockerid, compcategoryid,compstateid order by lockerid, compcategoryid) as  c inner join deliverybox d on c.lockerid = d.lockerid)as l inner join parcelfordelivery p on l.address=p.address and l.city=p.city and l.province=p.province and l.compcategoryid=p.dimensionid where p.receivertrackingid = '"+ trackingID +"' and p.lockerid is null order by l.lockerid;";
 
     try {
         const result = await db.query(query1);
@@ -153,28 +145,52 @@ app.get('/availableLockers', async (req, res) => {
         res.status(200).send(result);
     }
     catch (error) {
-        res.status(500).send({message: "Error2 while fetching available Lockers: " + error.message});
+        res.status(500).send({message: "Error while fetching available Lockers: " + error.message});
     }
 });
 
 app.post('/reserveLocker', async (req, res) => {
     const lockerID = req.body.lockerID;
     const compCategoryID = req.body.compCategoryID;
-    console.log(compCategoryID);
+    const trackingID = req.body.trackingID;
+    //console.log(compCategoryID);
 
     const q = "select compID from compartment where lockerid='" + lockerID + "' and compcategoryid=" + compCategoryID + " and compStateID=1 order by compid";
     try {
         const result = await db.query(q);
-        console.log(result.rows);
+        //console.log(result.rows);
         const compid = result.rows[0].compid;
 
-        const values = {
-            lockerid: lockerID,
-            compid: compid,
-            compstateid: 2
-        }
+        //updating parcelForDelivery table and setting lockerid for it
+        const q1 = "update parcelForDelivery set lockerId =" + lockerID + " where receiverTrackingId = '"+ trackingID +"'";
+        const r = await db.query(q1);
+        //console.log(r);
 
-        await axios.put('http://localhost:4002/Locker/Compartment/compstateid', values)
+        //updating status of compartment in locker to Reserved
+        const values1 = {
+          lockerid: lockerID,
+          compid: compid,
+          compstateid: 2
+        }
+        await axios.put('http://localhost:4002/Locker/Compartment/compstateid', values1)
+        .then(response => {
+            console.log(response.data);
+            //res.status(200).send({message: "Locker reserved"});
+        })
+        .catch(err => {
+            throw(err);
+        });
+
+        //updating status of compartment in locker to Reserved
+
+        //generating 4 digit random otp
+        const otp = Math.floor(Math.random() * 9000);
+        const values2 = {
+          lockerid: lockerID,
+          compid: compid,
+          otp: otp
+        }
+        await axios.put('http://localhost:4002/Locker/Compartment/otp', values2)
         .then(response => {
             console.log(response.data);
             res.status(200).send({message: "Locker reserved"});
