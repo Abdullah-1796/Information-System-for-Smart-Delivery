@@ -76,18 +76,7 @@ app.post('/postUpdates', async (req, res) => {
         const message = "Hi, Kindly select your delivery box for your item "+ d.itemName +" with your tracking id " + receiverTrackingID;
 
         //sending message
-
-        const client = twilio(sid, token);
-
-        await client.messages
-            .create({
-                body: message,
-                from: phone,
-                to: d.rphone,
-            })
-            // .then((message) => res.status(200).send({ message: `Message sent with SID: ${message.sid}` }))
-            // .catch((error) => res.status(500).send({ message: `Failed to send SMS: ${error.message}` }));
-
+        
         values.push(
             d.itemName,
             d.sname,
@@ -133,6 +122,20 @@ app.get('/getUpdates', async (req, res) => {
     }
 });
 
+app.get('/parcelToDeliverDetails', async (req, res) => {
+  const trackingID = req.query.trackingID;
+
+  const str = "select p.lockerid, p.compid, p.itemname, p.sname, p.rname, p.address, p.city, p.province, c.otp from (select lockerid, compid, itemname, sname, rname, address, city, province from parcelfordelivery where ridertrackingid = '"+ trackingID +"') as p inner join compartment c on p.lockerid=c.lockerid and p.compid=c.compid";
+
+  try {
+    const result = await db.query(str);
+    res.status(200).send(result);
+  } catch (error) {
+    res.status(500).send({message: "Error while getting parcel details for rider to deliver: " + error});
+  }
+
+})
+
 app.get('/availableLockers', async (req, res) => {
     const trackingID = req.query.trackingID;
 
@@ -162,7 +165,7 @@ app.post('/reserveLocker', async (req, res) => {
         const compid = result.rows[0].compid;
 
         //updating parcelForDelivery table and setting lockerid for it
-        const q1 = "update parcelForDelivery set lockerId =" + lockerID + " where receiverTrackingId = '"+ trackingID +"'";
+        const q1 = "update parcelForDelivery set lockerId =" + lockerID + ", compid = "+ compid +" where receiverTrackingId = '"+ trackingID +"'";
         const r = await db.query(q1);
         //console.log(r);
 
@@ -275,55 +278,55 @@ app.get('/api/parcel/:id', async (req, res) => {
   }
 });
 
-app.post('/postUpdates', async (req, res) => {
-  const data = req.body;
-  const query = `insert into parcelForDelivery(itemName, sname, sphone, semail, rname, rphone, remail, dimensionID, receiverTrackingID, riderTrackingID) values
-    ${data.map((d, i) => `($${i * 10 + 1}, $${i * 10 + 2}, $${i * 10 + 3}, $${i * 10 + 4}, $${i * 10 + 5}, $${i * 10 + 6}, $${i * 10 + 7}, $${i * 10 + 8}, $${i * 10 + 9}, $${i * 10 + 10})`)}
-    `;
+// app.post('/postUpdates', async (req, res) => {
+//   const data = req.body;
+//   const query = `insert into parcelForDelivery(itemName, sname, sphone, semail, rname, rphone, remail, dimensionID, receiverTrackingID, riderTrackingID) values
+//     ${data.map((d, i) => `($${i * 10 + 1}, $${i * 10 + 2}, $${i * 10 + 3}, $${i * 10 + 4}, $${i * 10 + 5}, $${i * 10 + 6}, $${i * 10 + 7}, $${i * 10 + 8}, $${i * 10 + 9}, $${i * 10 + 10})`)}
+//     `;
 
-  let receiverTrackingID = "123456";
-  let riderTrackingID = "123456";
-  let dimension = "small";
+//   let receiverTrackingID = "123456";
+//   let riderTrackingID = "123456";
+//   let dimension = "small";
 
-  const values = data.flatMap((d) => [
-    d.itemName,
-    d.sname,
-    d.sphone,
-    d.semail,
-    d.rname,
-    d.rphone,
-    d.remail,
-    dimension,
-    receiverTrackingID,
-    riderTrackingID
-  ]);
+//   const values = data.flatMap((d) => [
+//     d.itemName,
+//     d.sname,
+//     d.sphone,
+//     d.semail,
+//     d.rname,
+//     d.rphone,
+//     d.remail,
+//     dimension,
+//     receiverTrackingID,
+//     riderTrackingID
+//   ]);
 
-  try {
-    const result = await db.query(query, values);
-    console.log(result.rowCount);
-    res.status(200).send({ message: 'Rows Successfully inserted: ' + result.rowCount });
-  } catch (error) {
-    console.error("Error while insertion: " + error.message);
-    res.status(500).send({ message: "Error while insertion: " + error.message });
-  }
-});
+//   try {
+//     const result = await db.query(query, values);
+//     console.log(result.rowCount);
+//     res.status(200).send({ message: 'Rows Successfully inserted: ' + result.rowCount });
+//   } catch (error) {
+//     console.error("Error while insertion: " + error.message);
+//     res.status(500).send({ message: "Error while insertion: " + error.message });
+//   }
+// });
 
-app.get('/getUpdates', async (req, res) => {
-  const query = "select * from parcelForDelivery";
+// app.get('/getUpdates', async (req, res) => {
+//   const query = "select * from parcelForDelivery";
 
-  try {
-    const result = await db.query(query);
-    console.log({ rowCount: result.rowCount, rows: result.rows });
-    res.status(200).send({
-      message: "Data fetched successfully",
-      rowCount: result.rowCount,
-      rows: result.rows
-    });
-  } catch (error) {
-    console.error("Error while fetching: " + error.message);
-    res.status(500).send("Error while fetching: " + error.message);
-  }
-});
+//   try {
+//     const result = await db.query(query);
+//     console.log({ rowCount: result.rowCount, rows: result.rows });
+//     res.status(200).send({
+//       message: "Data fetched successfully",
+//       rowCount: result.rowCount,
+//       rows: result.rows
+//     });
+//   } catch (error) {
+//     console.error("Error while fetching: " + error.message);
+//     res.status(500).send("Error while fetching: " + error.message);
+//   }
+// });
 
 
 
