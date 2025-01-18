@@ -57,14 +57,14 @@ function SelectLocker() {
             </div>
             <div>
                 {
-                    data.map((d, i) => {
-                        return (
+                    data.map((d, i) => (
                             <div style={{ border: "1px solid black", backgroundColor: "lightblue", margin: "10px", borderRadius: "25px", boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)", textAlign: "center", width: "800px" }} onClick={() => { reserveLocker(d.lockerid, d.compcategoryid, d.parcelid) }}>
+                                
                                 <h2>{d.address + " " + (i + 1)} </h2>
                                 <h3>{d.city}</h3>
                             </div>
-                        );
-                    })
+                        )
+                    )
                 }
             </div>
         </div>

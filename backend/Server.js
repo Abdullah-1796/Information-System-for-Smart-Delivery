@@ -51,8 +51,8 @@ async function sendSMS(message, to) {
 
 app.post('/postUpdates', async (req, res) => {
     const data = req.body;
-    const query = `insert into parcelForDelivery(itemName, sname, sphone, semail, rname, rphone, remail, address, city, province, dimensionID, receiverTrackingID, riderTrackingID) values
-    ${data.map((d, i) => `($${i * 13 + 1}, $${i * 13 + 2}, $${i * 13 + 3}, $${i * 13 + 4}, $${i * 13 + 5}, $${i * 13 + 6}, $${i * 13 + 7}, $${i * 13 + 8}, $${i * 13 + 9}, $${i * 13 + 10}, $${i * 13 + 11}, $${i * 13 + 12}, $${i * 13 + 13})`)}`;
+    const query = `insert into parcelForDelivery(itemName, sname, sphone, semail, rname, rphone, remail, address, city, province, dimensionID, receiverTrackingID, riderTrackingID, status) values
+    ${data.map((d, i) => `($${i * 14 + 1}, $${i * 14 + 2}, $${i * 14 + 3}, $${i * 14 + 4}, $${i * 14 + 5}, $${i * 14 + 6}, $${i * 14 + 7}, $${i * 14 + 8}, $${i * 14 + 9}, $${i * 14 + 10}, $${i * 14 + 11}, $${i * 14 + 12}, $${i * 14 + 13}, $${i * 14 + 14})`)}`;
 
 
 
@@ -72,6 +72,7 @@ app.post('/postUpdates', async (req, res) => {
         const id = Date.now() + Math.floor(Math.random() * 1000);
         let receiverTrackingID = id + 1;
         let riderTrackingID = id + 2;
+        const status = "selectionPending";
 
         const message = "Hi, Kindly select your delivery box for your item "+ d.itemName +" with your tracking id " + receiverTrackingID;
 
@@ -90,7 +91,8 @@ app.post('/postUpdates', async (req, res) => {
             d.province,
             dimension,
             receiverTrackingID,
-            riderTrackingID
+            riderTrackingID,
+            status
         )
     }));
 
@@ -157,7 +159,7 @@ app.post('/reserveLocker', async (req, res) => {
     const compCategoryID = req.body.compCategoryID;
     const trackingID = req.body.trackingID;
     const parcelID = req.body.parcelID;
-    console.log("Parcelid: " + parcelID);
+    //console.log("Parcelid: " + parcelID);
 
     const q = "select compID from compartment where lockerid='" + lockerID + "' and compcategoryid=" + compCategoryID + " and compStateID=1 order by compid";
     try {
@@ -181,12 +183,12 @@ app.post('/reserveLocker', async (req, res) => {
         });
         
         //updating status of compartment in locker to Reserved
-        const values3 = {
+        const values2 = {
           lockerid: lockerID,
           compid: compid,
           parcelid: parcelID
         }
-        await axios.put('http://localhost:4002/Locker/Compartment/parcelid', values3)
+        await axios.put('http://localhost:4002/Locker/Compartment/parcelid', values2)
         .then(response => {
             console.log(response.data);
             //res.status(200).send({message: "Locker reserved"});
@@ -201,27 +203,66 @@ app.post('/reserveLocker', async (req, res) => {
         //console.log(r);
 
         //updating status of compartment in locker to Reserved
-
         //generating 4 digit random otp
         const otp = Math.floor(Math.random() * 9000);
-        const values2 = {
+        const values3 = {
           lockerid: lockerID,
           compid: compid,
           otp: otp
         }
-        await axios.put('http://localhost:4002/Locker/Compartment/otp', values2)
+        await axios.put('http://localhost:4002/Locker/Compartment/otp', values3)
         .then(response => {
             console.log(response.data+" "+ otp);
-            res.status(200).send({message: "Locker reserved"});
         })
         .catch(err => {
             throw(err);
+        });
+
+        const values4 = {
+          lockerid: lockerID,
+          compid: compid,
+          purpose: "receiving"
+        }
+        await axios.put('http://localhost:4002/Locker/Compartment/purpose', values4)
+        .then(response => {
+          console.log(response.data.message);
+        })
+        .catch(err => {
+          throw(err);
+        });
+
+        const values5 = {
+          parcelID: parcelID,
+          status: "selectionDone"
+        }
+        await axios.put('http://localhost:4001/updateStatus', values5)
+        .then(response => {
+          console.log(response.data.message);
+          res.status(200).send({message: "Locker reserved"});
+        })
+        .catch(err => {
+          throw(err);
         });
         
     } catch (error) {
         res.status(500).send({message: "Error while reserving available Lockers: " + error.message});
     }
 
+});
+
+app.put('/updateStatus', async (req, res) => {
+  const parcelID = req.body.parcelID;
+  const status = req.body.status;
+
+  const str = "update parcelForDelivery set status ='"+ status +"' where parcelid = " + parcelID;
+
+  try {
+    const result = await db.query(str);
+    res.status(200).send({message: "Parcel status updated successfully"});
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({message: "Error while updating status of parcel: " + error});
+  }
 });
 
 //---------------------------------------------------------------------------------------------------
