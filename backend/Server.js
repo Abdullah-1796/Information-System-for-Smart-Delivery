@@ -134,13 +134,13 @@ app.get('/parcelToDeliverDetails', async (req, res) => {
     res.status(500).send({message: "Error while getting parcel details for rider to deliver: " + error});
   }
 
-})
+});
 
 app.get('/availableLockers', async (req, res) => {
     const trackingID = req.query.trackingID;
 
     //finding and matching lockers with parcel details
-    const query1 = "select l.lockerid, l.compcategoryid, l.address, l.city, l.province, p.itemname, p.sname, p.rname, p.rphone from (select d.lockerid, d.address, d.city, d.province, c.compcategoryid from (select lockerid, compcategoryid from compartment where compstateid = 1 and lockerid is not null group by lockerid, compcategoryid,compstateid order by lockerid, compcategoryid) as  c inner join deliverybox d on c.lockerid = d.lockerid)as l inner join parcelfordelivery p on l.address=p.address and l.city=p.city and l.province=p.province and l.compcategoryid=p.dimensionid where p.receivertrackingid = '"+ trackingID +"' and p.lockerid is null order by l.lockerid;";
+    const query1 = "select l.lockerid, l.compcategoryid, l.address, l.city, l.province,p.parcelid, p.itemname, p.sname, p.rname, p.rphone from (select d.lockerid, d.address, d.city, d.province, c.compcategoryid from (select lockerid, compcategoryid from compartment where compstateid = 1 and lockerid is not null group by lockerid, compcategoryid,compstateid order by lockerid, compcategoryid) as  c inner join deliverybox d on c.lockerid = d.lockerid)as l inner join parcelfordelivery p on l.address=p.address and l.city=p.city and l.province=p.province and l.compcategoryid=p.dimensionid where p.receivertrackingid = '"+ trackingID +"' and p.lockerid is null order by l.lockerid;";
 
     try {
         const result = await db.query(query1);
@@ -156,18 +156,14 @@ app.post('/reserveLocker', async (req, res) => {
     const lockerID = req.body.lockerID;
     const compCategoryID = req.body.compCategoryID;
     const trackingID = req.body.trackingID;
-    //console.log(compCategoryID);
+    const parcelID = req.body.parcelID;
+    console.log("Parcelid: " + parcelID);
 
     const q = "select compID from compartment where lockerid='" + lockerID + "' and compcategoryid=" + compCategoryID + " and compStateID=1 order by compid";
     try {
         const result = await db.query(q);
         //console.log(result.rows);
         const compid = result.rows[0].compid;
-
-        //updating parcelForDelivery table and setting lockerid for it
-        const q1 = "update parcelForDelivery set lockerId =" + lockerID + ", compid = "+ compid +" where receiverTrackingId = '"+ trackingID +"'";
-        const r = await db.query(q1);
-        //console.log(r);
 
         //updating status of compartment in locker to Reserved
         const values1 = {
@@ -183,6 +179,26 @@ app.post('/reserveLocker', async (req, res) => {
         .catch(err => {
             throw(err);
         });
+        
+        //updating status of compartment in locker to Reserved
+        const values3 = {
+          lockerid: lockerID,
+          compid: compid,
+          parcelid: parcelID
+        }
+        await axios.put('http://localhost:4002/Locker/Compartment/parcelid', values3)
+        .then(response => {
+            console.log(response.data);
+            //res.status(200).send({message: "Locker reserved"});
+        })
+        .catch(err => {
+            throw(err);
+        });
+        
+        //updating parcelForDelivery table and setting lockerid for it
+        const q1 = "update parcelForDelivery set lockerId =" + lockerID + ", compid = "+ compid +" where receiverTrackingId = '"+ trackingID +"'";
+        const r = await db.query(q1);
+        //console.log(r);
 
         //updating status of compartment in locker to Reserved
 
@@ -195,7 +211,7 @@ app.post('/reserveLocker', async (req, res) => {
         }
         await axios.put('http://localhost:4002/Locker/Compartment/otp', values2)
         .then(response => {
-            console.log(response.data);
+            console.log(response.data+" "+ otp);
             res.status(200).send({message: "Locker reserved"});
         })
         .catch(err => {
@@ -206,7 +222,7 @@ app.post('/reserveLocker', async (req, res) => {
         res.status(500).send({message: "Error while reserving available Lockers: " + error.message});
     }
 
-})
+});
 
 //---------------------------------------------------------------------------------------------------
 app.get('/api/delivery-boxes', (req, res) => {
@@ -394,7 +410,7 @@ app.post("/compartment", (req, res) => {
     addcompartment(id, 0, 0, noOfCompartments)
   }
   res.json({message:"Added Successfully"})
-})
+});
 
 app.delete("/compartment", (req, res) => {
   const lockerId = req.query.lockerid;

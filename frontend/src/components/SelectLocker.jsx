@@ -9,12 +9,13 @@ function SelectLocker() {
         setTrackingID(event.target.value);
     }
 
-    function reserveLocker(lockerID, compCategoryID) {
+    function reserveLocker(lockerID, compCategoryID, parcelID) {
         console.log(lockerID);
         const value = {
             lockerID: lockerID,
             compCategoryID: compCategoryID,
             trackingID: trackingID,
+            parcelID: parcelID
         }
         axios.post('http://localhost:4001/reserveLocker', value)
             .then(res => {
@@ -58,7 +59,7 @@ function SelectLocker() {
                 {
                     data.map((d, i) => {
                         return (
-                            <div style={{ border: "1px solid black", backgroundColor: "lightblue", margin: "10px", borderRadius: "25px", boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)", textAlign: "center", width: "800px" }} onClick={() => { reserveLocker(d.lockerid, d.compcategoryid) }}>
+                            <div style={{ border: "1px solid black", backgroundColor: "lightblue", margin: "10px", borderRadius: "25px", boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)", textAlign: "center", width: "800px" }} onClick={() => { reserveLocker(d.lockerid, d.compcategoryid, d.parcelid) }}>
                                 <h2>{d.address + " " + (i + 1)} </h2>
                                 <h3>{d.city}</h3>
                             </div>
