@@ -1,13 +1,14 @@
 import React from "react";
 import {Link} from "react-router";
+import "../styles/AdminHome.css";
 
 function RiderHome()
 {
     return(
-        <div>
-            <Link to={"/ParcelReceivingDetail"}><button>Parcel Receiving Details</button></Link>
-            <br/>
-            <Link to={"/ParcelDeliveryDetail"}><button>Parcel Delivery Details</button></Link>
+        <div id="adminHomeBody">
+            <button className="adminButton"><Link to={"/ParcelReceivingDetail"}>Parcel Receiving Details</Link></button>
+            <button className="adminButton"><Link to={"/ParcelDeliveryDetail"}>Parcel Delivery Details</Link></button>
+            <button className="adminButton"><Link to={"/FailedParcelDetail"}>Failed Parcel Details</Link></button>
         </div>
     );
 }

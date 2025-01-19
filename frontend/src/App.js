@@ -8,6 +8,7 @@ import SelectLocker from './components/SelectLocker';
 import RiderHome from './components/RiderHome';
 import ParcelDeliveryDetail from './components/ParcelDeliveryDetail';
 import ParcelReceivingDetail from './components/ParcelReceivingDetail';
+import FailedParcelDetail from './components/FailedParcelDetail';
 
 function App() {
 	return (
@@ -21,6 +22,7 @@ function App() {
 				<Route exact path="/RiderHome" element={<RiderHome />} />
 				<Route exact path="/ParcelDeliveryDetail" element={<ParcelDeliveryDetail />} />
 				<Route exact path="/ParcelReceivingDetail" element={<ParcelReceivingDetail />} />
+				<Route exact path="/FailedParcelDetail" element={<FailedParcelDetail />} />
 				<Route path="*" element={<Navigate to="/" />} />
 			</Routes>
 		</Router>

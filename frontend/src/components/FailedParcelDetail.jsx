@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 
-function ParcelDeliveryDetail()
+function FailedParcelDetail()
 {
     const [trackingID, setTrackingID] = React.useState("");
     const [data, setData] = React.useState([]);
@@ -14,7 +14,7 @@ function ParcelDeliveryDetail()
         const value = {
             trackingID: trackingID,
         }
-        axios.get('http://localhost:4001/parcelToDeliver/Details', { params: value })
+        axios.get('http://localhost:4001/failedDelivery/ParcelToBring/Details', { params: value })
             .then(res => {
                 console.log(res.data.rows);
                 setData(res.data.rows);
@@ -46,4 +46,4 @@ function ParcelDeliveryDetail()
     );
 }
 
-export default ParcelDeliveryDetail;
+export default FailedParcelDetail;
