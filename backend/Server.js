@@ -167,6 +167,16 @@ app.post('/reserveLocker', async (req, res) => {
 		//console.log(result.rows);
 		const compid = result.rows[0].compid;
 
+		//adding timestamp for selection
+		const str = "insert into timestamps(selection) values(now());update parcelfordelivery set stampid = (select stampid from timestamps order by stampid desc limit 1) where parcelid = " + parcelID;
+
+		try {
+			const result = await db.query(str);
+			console.log("timestamp of selection has been added");
+		} catch (error) {
+			console.log("Error while adding timestamp of selection: " + error);
+		}
+
 		//updating status of compartment in locker to Reserved
 		const values1 = {
 			lockerid: lockerID,
@@ -271,34 +281,44 @@ app.put('/markFailDeliveries', async (req, res) => {
 
 	console.log("Number of days: " + days);
 
-	const str = "select parcelid, to_char(creationtime, 'yyyy-mm-dd') as date from parcelfordelivery where status ='parcelPlaced'";
+	const str = "select parcelid, stampid,  to_char(creationtime, 'yyyy-mm-dd') as date from parcelfordelivery where status ='parcelPlaced'";
 
 	try {
 		const result = await db.query(str);
 		//console.log(result);
-		if(result.rowCount > 0)
-		{
-			for(let i = 0; i < result.rowCount; i++)
-			{
+		if (result.rowCount > 0) {
+			for (let i = 0; i < result.rowCount; i++) {
 
 				const date1 = new Date(result.rows[i].date);
 				const date2 = new Date(Date.now());
-			
+
 				const daysWaited = (date2.getTime() - date1.getTime()) / (24 * 60 * 60 * 1000);
 				console.log("Days delayed: " + daysWaited);
-				if(daysWaited >= days)
-				{
+				if (daysWaited >= days) {
 					const str1 = "update parcelForDelivery set status = 'failed' where parcelid = " + result.rows[i].parcelid;
 
 					const result1 = await db.query(str1);
+
+					const values = {
+						column: "failed",
+						stampid: result.rows[i].stampid
+					}
+					await axios.put('http://localhost:4001/updateTimestamp', values)
+						.then(response => {
+							console.log(response.data.message);
+						})
+						.catch(err => {
+							console.error("Error while updating status of parcel: " + err);
+						});
+
 					failedDeliveries++;
 				}
-				
+
 			}
 		}
-		res.status(200).send({message: "Number of deliveries masked as failed: " + failedDeliveries});
+		res.status(200).send({ message: "Number of deliveries masked as failed: " + failedDeliveries });
 	} catch (error) {
-		res.status(500).send({message: "Error while marking failed deliveries: " + error});
+		res.status(500).send({ message: "Error while marking failed deliveries: " + error });
 	}
 });
 
@@ -314,6 +334,22 @@ app.get('/failedDelivery/ParcelToBring/Details', async (req, res) => {
 		res.status(500).send({ message: "Error while getting failed delivery details for rider to bring back: " + error });
 	}
 
+});
+
+app.put('/updateTimestamp', async (req, res) => {
+	const column = req.body.column;
+	const stampid = req.body.stampid;
+
+	console.log(column, stampid);
+	const str = "update timestamps set " + column + "= now() where stampid=" + stampid;
+
+	try {
+		const result = await db.query(str);
+		res.status(200).send({ message: "timestamp of " + column + " has been updated" });
+	} catch (error) {
+		console.log(error);
+		res.status(500).send({ message: "Error while updating timestamp of " + column + ": " + error });
+	}
 });
 
 //---------------------------------------------------------------------------------------------------
