@@ -1,4 +1,4 @@
-import express from "express";
+import express, { response } from "express";
 import pg from "pg";
 import cors from "cors";
 import bodyParser from "body-parser";
@@ -167,14 +167,33 @@ app.post('/reserveLocker', async (req, res) => {
 		//console.log(result.rows);
 		const compid = result.rows[0].compid;
 
-		//adding timestamp for selection
-		const str = "insert into timestamps(selection) values(now());update parcelfordelivery set stampid = (select stampid from timestamps order by stampid desc limit 1) where parcelid = " + parcelID;
+		//checking whether it is first attempt or reattempt
+		const str = "select stampid from parcelForDelivery where parcelid = " + parcelID + " and stampid is not null";
+		const result2 = await db.query(str);
+		if(result2.rowCount == 0)
+		{
+			//adding timestamp for selection
+			const str1 = "insert into timestamps(selection) values(now());update parcelfordelivery set stampid = (select stampid from timestamps order by stampid desc limit 1) where parcelid = " + parcelID;
 
-		try {
-			const result = await db.query(str);
-			console.log("timestamp of selection has been added");
-		} catch (error) {
-			console.log("Error while adding timestamp of selection: " + error);
+			try {
+				const result = await db.query(str1);
+				console.log("timestamp of selection has been added");
+			} catch (error) {
+				console.log("Error while adding timestamp of selection: " + error);
+			}
+		}
+		else {
+			const values = {
+				stampid: result2.rows[0].stampid,
+			}
+
+			await axios.put('http://localhost:4001/updateTimestamp/reAttempt', values)
+			.then(response => {
+				console.log(response.message);
+			})
+			.catch(err => {
+				console.error(err);
+			});
 		}
 
 		//updating status of compartment in locker to Reserved
@@ -281,7 +300,7 @@ app.put('/markFailDeliveries', async (req, res) => {
 
 	console.log("Number of days: " + days);
 
-	const str = "select parcelid, stampid,  to_char(creationtime, 'yyyy-mm-dd') as date from parcelfordelivery where status ='parcelPlaced'";
+	const str = "select parcelid, stampid, lockerid, compid, to_char(creationtime, 'yyyy-mm-dd') as date from parcelfordelivery where status ='parcelPlaced'";
 
 	try {
 		const result = await db.query(str);
@@ -310,6 +329,20 @@ app.put('/markFailDeliveries', async (req, res) => {
 						.catch(err => {
 							console.error("Error while updating status of parcel: " + err);
 						});
+					
+					const otp = Math.floor(Math.random() *9000);
+					const values1 = {
+						lockerid: result.rows[i].lockerid,
+						compid: result.rows[i].compid,
+						otp: otp
+					}
+					axios.put('http://localhost:4002/Locker/Compartment/otp', values1)
+					.then(response => {
+						console.log(response.data.message);
+					})
+					.catch(err => {
+						console.error(err);
+					});
 
 					failedDeliveries++;
 				}
@@ -351,6 +384,69 @@ app.put('/updateTimestamp', async (req, res) => {
 		res.status(500).send({ message: "Error while updating timestamp of " + column + ": " + error });
 	}
 });
+
+app.put('/updateTimestamp/reAttempt', async (req, res) => {
+	const stampid = req.body.stampid;
+
+	console.log(stampid);
+	const str = "update timestamps set reattempt= now(), placement = null where stampid=" + stampid;
+
+	try {
+		const result = await db.query(str);
+		res.status(200).send({ message: "timestamp of reattempt has been updated" });
+	} catch (error) {
+		console.log(error);
+		res.status(500).send({ message: "Error while updating timestamp of reattempt: " + error });
+	}
+});
+
+app.get('/checkEligibility/ReDelivery', async (req, res) => {
+	const trackingID = req.query.trackingID;
+	//console.log(trackingID);
+
+	const str = "select parcelid, p.stampid, p.lockerid, p.compid from (select parcelid, stampid, lockerid, compid from parcelfordelivery where receiverTrackingID='"+ trackingID +"') as p inner join timestamps t on p.stampid=t.stampid where t.failed is not null and t.reattempt is null";
+
+	try {
+		const result = await db.query(str);
+		//console.log(result);
+		if(result.rowCount == 1)
+		{
+			res.status(200).send({message: "Eligibility Confirmed", eligible: true, stampid: result.rows[0].stampid, lockerid: result.rows[0].lockerid, compid: result.rows[0].compid, parcelid: result.rows[0].parcelid});
+		}
+		else {
+			res.status(200).send({message: "Eligibility Denied", eligible: false});
+		}
+	} catch (error) {
+		console.log("Error while checking eligibility for rescheduling" + error);
+		res.status(500).send({message: "Error while checking eligibility for rescheduling" + error});
+	}
+});
+
+app.put("/parcelForDelivery/updateLockerID", (req, res) => {
+    let parcelID = req.body.parcelID;
+
+    const str = "update parcelForDelivery set lockerid = null, compid = null where parcelid = " + parcelID;
+
+    db.query(str, (err, data) => {
+        if (err) {
+            return res.json("Error");
+        }
+        return res.json("Locker ID and CompID updated");
+    });
+});
+
+app.get("/checkParcelInLocker", async (req, res) => {
+	const trackingID = req.query.trackingID;
+
+	const str = "select d.lockerid, p.compid, d.address, d.city, d.province from (select lockerid, compid from parcelfordelivery where receivertrackingid = '"+ trackingID +"' and lockerid is not null) as p inner join deliverybox d on p.lockerid=d.lockerid";
+
+	try {
+		const result = await db.query(str);
+		res.status(200).send(result);
+	} catch (error) {
+		
+	}
+})
 
 //---------------------------------------------------------------------------------------------------
 app.get('/api/delivery-boxes', (req, res) => {

@@ -9,6 +9,8 @@ import RiderHome from './components/RiderHome';
 import ParcelDeliveryDetail from './components/ParcelDeliveryDetail';
 import ParcelReceivingDetail from './components/ParcelReceivingDetail';
 import FailedParcelDetail from './components/FailedParcelDetail';
+import ReceiverHome from './components/ReceiverHome';
+import ReScheduleDelivery from './components/ReScheduleDelivery';
 
 function App() {
 	return (
@@ -18,7 +20,9 @@ function App() {
 				<Route exact path="/LockerList" element={<LockerList />} />
 				<Route exact path="/Locker/:id" element={<Locker />} />
 				<Route exact path="/AdminHome" element={<AdminHome />} />
+				<Route exact path="/ReceiverHome" element={<ReceiverHome />} />
 				<Route exact path="/SelectLocker" element={<SelectLocker />} />
+				<Route exact path="/ReScheduleDelivery" element={<ReScheduleDelivery />} />
 				<Route exact path="/RiderHome" element={<RiderHome />} />
 				<Route exact path="/ParcelDeliveryDetail" element={<ParcelDeliveryDetail />} />
 				<Route exact path="/ParcelReceivingDetail" element={<ParcelReceivingDetail />} />
