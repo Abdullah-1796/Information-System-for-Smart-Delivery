@@ -11,6 +11,7 @@ import ParcelReceivingDetail from './components/ParcelReceivingDetail';
 import FailedParcelDetail from './components/FailedParcelDetail';
 import ReceiverHome from './components/ReceiverHome';
 import ReScheduleDelivery from './components/ReScheduleDelivery';
+import SendParcel from './components/SendParcel';
 
 function App() {
 	return (
@@ -27,6 +28,7 @@ function App() {
 				<Route exact path="/ParcelDeliveryDetail" element={<ParcelDeliveryDetail />} />
 				<Route exact path="/ParcelReceivingDetail" element={<ParcelReceivingDetail />} />
 				<Route exact path="/FailedParcelDetail" element={<FailedParcelDetail />} />
+				<Route exact path="/SendParcel" element={<SendParcel/>}/>
 				<Route path="*" element={<Navigate to="/" />} />
 			</Routes>
 		</Router>
