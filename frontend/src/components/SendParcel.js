@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Country, State, City } from "country-state-city";
 import "../styles/SendParcel.css";
 import axios from "axios";
-import SelectLocker from "./SelectLocker";
 import AvailableLockers from "./AvailableLockers";
 
 const SendParcel = () => {
@@ -24,6 +23,7 @@ const SendParcel = () => {
   const [provinces, setProvinces] = useState([]);
   const [cities, setCities] = useState([]);
   const [selectedLocker, setSelectedLocker] = useState("");
+  const [compID,setCompID]=useState("");
   const [formValid, setFormValid] = useState(false);
 
   // Add validation effect
@@ -34,8 +34,9 @@ const SendParcel = () => {
   }, [formData, selectedLocker]);
 
   // Add locker selection handler
-  const handleLockerSelect = (lockerId) => {
+  const handleLockerSelect = (lockerId,compID) => {
     setSelectedLocker(lockerId);
+    setCompID(compID);
   };
 
   // Load countries on mount
@@ -66,12 +67,35 @@ const SendParcel = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const id = Date.now() + Math.floor(Math.random() * 1000);
-
-    // Convert ISO codes to human-readable names
     const countryName =
       countries.find((c) => c.isoCode === formData.country)?.name || "";
     const provinceName =
       provinces.find((p) => p.isoCode === formData.province)?.name || "";
+  
+    // Validate required fields
+    const requiredFields = [
+      { key: "parcelDescription", label: "Parcel Description" },
+      { key: "parcelWeight", label: "Parcel Weight" },
+      { key: "senderName", label: "Sender Name" },
+      { key: "senderPhone", label: "Sender Phone" },
+      { key: "senderAddress", label: "Sender Address" },
+      { key: "receiverName", label: "Receiver Name" },
+      { key: "receiverPhone", label: "Receiver Phone" },
+      { key: "receiverAddress", label: "Receiver Address" },
+      { key: "city", label: "City" },
+      { key: "province", label: "Province" },
+      { key: "country", label: "Country" },
+    ];
+  
+    const missingFields = requiredFields
+      .filter((field) => !formData[field.key]?.trim()) // Check for empty values
+      .map((field) => field.label);
+  
+    if (missingFields.length > 0) {
+      alert(`Please fill in the following fields:\n${missingFields.join("\n")}`);
+      return; // Stop form submission
+    }
+  
     const requestData = {
       lockerid: selectedLocker,
       itemName: formData.parcelDescription,
@@ -85,23 +109,20 @@ const SendParcel = () => {
       city: formData.city,
       province: provinceName,
       country: countryName,
-      dimensionID: null,
+      dimensionID: formData.parcelWeight === "small" ? 1 : formData.parcelWeight === "medium" ? 2 : "large"?3:null,
       receiverTrackingID: null,
       riderTrackingID: id + 2,
-      lockerID: null,
-      compID: null,
+      lockerID: selectedLocker,
+      compID: compID,
       status: "Pending",
       stampid: null,
     };
-
+  
     try {
-      const response = await axios.post(
-        "http://localhost:4001/sendParcel",
-        requestData
-      );
+      const response = await axios.post("http://localhost:4001/sendParcel", requestData);
       if (response.data.success) {
         alert("Parcel successfully sent!");
-        // Reset all fields including location
+        // Reset all fields
         setFormData({
           parcelDescription: "",
           parcelWeight: "",
@@ -126,54 +147,6 @@ const SendParcel = () => {
     <div className="container">
       <h2>Parcel Delivery Form</h2>
       <form onSubmit={handleSubmit}>
-        {/* PARCEL DETAILS - PRESERVED */}
-        <h3>Parcel Details</h3>
-        <label>Description:</label>
-        <input
-          type="text"
-          name="parcelDescription"
-          value={formData.parcelDescription}
-          onChange={handleChange}
-          required
-        />
-
-        <label>Weight (kg):</label>
-        <input
-          type="number"
-          name="parcelWeight"
-          value={formData.parcelWeight}
-          onChange={handleChange}
-          required
-        />
-
-        {/* SENDER DETAILS - PRESERVED */}
-        <h3>Sender Details</h3>
-        <label>Name:</label>
-        <input
-          type="text"
-          name="senderName"
-          value={formData.senderName}
-          onChange={handleChange}
-          required
-        />
-
-        <label>Phone:</label>
-        <input
-          type="text"
-          name="senderPhone"
-          value={formData.senderPhone}
-          onChange={handleChange}
-          required
-        />
-
-        <label>Address:</label>
-        <textarea
-          name="senderAddress"
-          value={formData.senderAddress}
-          onChange={handleChange}
-          required
-        ></textarea>
-
         {/* LOCATION DETAILS - MODIFIED */}
         <h3>Location Details</h3>
         <label>Country:</label>
@@ -222,6 +195,57 @@ const SendParcel = () => {
             </option>
           ))}
         </select>
+        {/* PARCEL DETAILS - PRESERVED */}
+        <h3>Parcel Details</h3>
+        <label>Description:</label>
+        <input
+          type="text"
+          name="parcelDescription"
+          value={formData.parcelDescription}
+          onChange={handleChange}
+          required
+        />
+
+        <label>Parcel Size:</label>
+        <select
+          name="parcelWeight"
+          value={formData.parcelWeight}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Select Size</option>
+          <option value="small">Small (1 to 3kg)</option>
+          <option value="medium">Medium (3.1 to 5kg)</option>
+          <option value="large">Large (5.1 to 10kg)</option>
+        </select>
+
+        {/* SENDER DETAILS - PRESERVED */}
+        <h3>Sender Details</h3>
+        <label>Name:</label>
+        <input
+          type="text"
+          name="senderName"
+          value={formData.senderName}
+          onChange={handleChange}
+          required
+        />
+
+        <label>Phone:</label>
+        <input
+          type="text"
+          name="senderPhone"
+          value={formData.senderPhone}
+          onChange={handleChange}
+          required
+        />
+
+        <label>Address:</label>
+        <textarea
+          name="senderAddress"
+          value={formData.senderAddress}
+          onChange={handleChange}
+          required
+        ></textarea>
 
         {/* RECEIVER DETAILS - PRESERVED */}
         <h3>Receiver Details</h3>
@@ -254,6 +278,7 @@ const SendParcel = () => {
           city={formData.city}
           parcelDetails={{
             trackingID: formData.riderTrackingID, // or your generated tracking ID
+            parcelWeight: formData.parcelWeight,
           }}
           onLockerSelect={handleLockerSelect}
         />
