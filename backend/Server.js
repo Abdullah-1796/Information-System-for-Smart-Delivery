@@ -701,3 +701,88 @@ function addcompartment(lockerid, noofSmall, noofMedium, noofLarge) {
 		}
 	}
 }
+
+// Route to add a new parcel for the Sender
+app.post("/sendParcel", async (req, res) => {
+  try {
+    const {
+      itemName,
+      sname,
+      sphone,
+      semail,
+      rname,
+      rphone,
+      remail,
+      address,
+      city,
+      province,
+      dimensionID,
+      receiverTrackingID,
+      riderTrackingID,
+      lockerID,
+      compID,
+      status,
+      stampid,
+    } = req.body;
+
+    const query = `
+      INSERT INTO SendParcel (
+        itemName, sname, sphone, semail, rname, rphone, remail, address, city, 
+        province, dimensionID, receiverTrackingID, riderTrackingID, lockerID, compID, status, stampid
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17
+      ) RETURNING *;
+    `;
+
+    const values = [
+      itemName,
+      sname,
+      sphone,
+      semail,
+      rname,
+      rphone,
+      remail,
+      address,
+      city,
+      province,
+      dimensionID,
+      receiverTrackingID,
+      riderTrackingID,
+      lockerID,
+      compID,
+      status,
+      stampid,
+    ];
+
+    const result = await db.query(query, values);
+    res.status(201).json({ success: true, data: result.rows[0] });
+
+  } catch (error) {
+    console.error("Error inserting parcel:", error);
+    res.status(500).json({ success: false, message: "Database error" });
+  }
+});
+
+//route to get parcel lockers based on city
+app.get("/getlockers", async (req, res) => {
+  try {
+    const { city, compcategoryid } = req.query; // Get both query parameters
+    if (!city || !compcategoryid) {
+      return res.status(400).json({ success: false, message: "City and compcategoryid are required" });
+    }
+
+    const query = `SELECT * FROM deliveryBox d 
+                   INNER JOIN compartment c 
+                   ON d.lockerID = c.lockerID 
+                   WHERE d.city = $1 AND c.compcategoryid = $2`;
+
+    const { rows } = await db.query(query, [city, compcategoryid]); // Pass both parameters
+
+    res.json({ success: true, data: rows });
+  } catch (error) {
+    console.error("Error getting Delivery Boxes: ", error);
+    res.status(500).json({ success: false, message: "Database error" });
+  }
+});
+
+
