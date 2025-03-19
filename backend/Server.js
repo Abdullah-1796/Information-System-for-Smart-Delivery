@@ -6,13 +6,30 @@ import fs from 'fs';
 import path from "path";
 import twilio from "twilio";
 import axios from "axios";
-
+import swaggerUi from "swagger-ui-express";
+import swaggerJsdoc from "swagger-jsdoc"
 
 const port = 4001;
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+const swaggerOptions = {
+	swaggerDefinition: {
+		openapi: "3.0.0",
+		info: {
+			title: "Smart Locker API",
+			version: "1.0.0",
+			description: "API documentation for Smart Locker system",
+		},
+	},
+	apis: ["./server.js"],
+};
+const swaggerDocs = swaggerJsdoc(swaggerOptions);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+
 
 const db = new pg.Client({
 	user: "postgres",
@@ -48,6 +65,50 @@ async function sendSMS(message, to) {
 		.catch((error) => res.status(500).send({ message: `Failed to send SMS: ${error.message}` }));
 }
 
+/**
+ * @swagger
+ * /postUpdates:
+ *   post:
+ *     summary: Insert multiple parcel deliveries into the database
+ *     tags:
+ *       - Parcel
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: array
+ *             items:
+ *               type: object
+ *               properties:
+ *                 itemName:
+ *                   type: string
+ *                 sname:
+ *                   type: string
+ *                 sphone:
+ *                   type: string
+ *                 semail:
+ *                   type: string
+ *                 rname:
+ *                   type: string
+ *                 rphone:
+ *                   type: string
+ *                 remail:
+ *                   type: string
+ *                 address:
+ *                   type: string
+ *                 city:
+ *                   type: string
+ *                 province:
+ *                   type: string
+ *                 weight:
+ *                   type: number
+ *     responses:
+ *       200:
+ *         description: Rows Successfully inserted
+ *       500:
+ *         description: Error while insertion
+ */
 
 app.post('/postUpdates', async (req, res) => {
 	const data = req.body;
@@ -107,6 +168,32 @@ app.post('/postUpdates', async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /getUpdates:
+ *   get:
+ *     summary: Get parcels with status 'selectionDone'
+ *     tags:
+ *       - Parcel
+ *     responses:
+ *       200:
+ *         description: Data fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 rowCount:
+ *                   type: integer
+ *                 rows:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       500:
+ *         description: Error while fetching data
+ */
 app.get('/getUpdates', async (req, res) => {
 	const query = "select * from parcelForDelivery where status = 'selectionDone';";
 
@@ -124,6 +211,26 @@ app.get('/getUpdates', async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /parcelToDeliver/Details:
+ *   get:
+ *     summary: Get parcel details for rider using tracking ID
+ *     tags:
+ *       - Parcel
+ *     parameters:
+ *       - in: query
+ *         name: trackingID
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Tracking ID of the parcel
+ *     responses:
+ *       200:
+ *         description: Parcel details retrieved successfully
+ *       500:
+ *         description: Error while fetching parcel details
+ */
 app.get('/parcelToDeliver/Details', async (req, res) => {
 	const trackingID = req.query.trackingID;
 
@@ -138,6 +245,26 @@ app.get('/parcelToDeliver/Details', async (req, res) => {
 
 });
 
+/**
+ * @swagger
+ * /availableLockers:
+ *   get:
+ *     summary: Get available lockers for a parcel based on tracking ID
+ *     tags:
+ *       - Lockers
+ *     parameters:
+ *       - in: query
+ *         name: trackingID
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Receiver tracking ID of the parcel
+ *     responses:
+ *       200:
+ *         description: Available lockers fetched successfully
+ *       500:
+ *         description: Error while fetching available lockers
+ */
 app.get('/availableLockers', async (req, res) => {
 	const trackingID = req.query.trackingID;
 
@@ -154,6 +281,40 @@ app.get('/availableLockers', async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /reserveLocker:
+ *   post:
+ *     summary: Reserve a locker for parcel delivery
+ *     tags:
+ *       - Lockers
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               lockerID:
+ *                 type: string
+ *                 description: The ID of the locker to reserve
+ *               compCategoryID:
+ *                 type: integer
+ *                 description: The compartment category ID
+ *               trackingID:
+ *                 type: string
+ *                 description: The tracking ID of the parcel
+ *               parcelID:
+ *                 type: integer
+ *                 description: The parcel ID
+ *     responses:
+ *       200:
+ *         description: Locker reserved successfully
+ *       400:
+ *         description: Invalid request parameters
+ *       500:
+ *         description: Error while reserving locker
+ */
 app.post('/reserveLocker', async (req, res) => {
 	const lockerID = req.body.lockerID;
 	const compCategoryID = req.body.compCategoryID;
@@ -170,8 +331,7 @@ app.post('/reserveLocker', async (req, res) => {
 		//checking whether it is first attempt or reattempt
 		const str = "select stampid from parcelForDelivery where parcelid = " + parcelID + " and stampid is not null";
 		const result2 = await db.query(str);
-		if(result2.rowCount == 0)
-		{
+		if (result2.rowCount == 0) {
 			//adding timestamp for selection
 			const str1 = "insert into timestamps(selection) values(now());update parcelfordelivery set stampid = (select stampid from timestamps order by stampid desc limit 1) where parcelid = " + parcelID;
 
@@ -188,12 +348,12 @@ app.post('/reserveLocker', async (req, res) => {
 			}
 
 			await axios.put('http://localhost:4001/updateTimestamp/reAttempt', values)
-			.then(response => {
-				console.log(response.message);
-			})
-			.catch(err => {
-				console.error(err);
-			});
+				.then(response => {
+					console.log(response.message);
+				})
+				.catch(err => {
+					console.error(err);
+				});
 		}
 
 		//updating status of compartment in locker to Reserved
@@ -279,6 +439,32 @@ app.post('/reserveLocker', async (req, res) => {
 
 });
 
+/**
+ * @swagger
+ * /updateStatus:
+ *   put:
+ *     summary: Update the status of a parcel
+ *     tags:
+ *       - Parcels
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               parcelID:
+ *                 type: integer
+ *                 description: The ID of the parcel
+ *               status:
+ *                 type: string
+ *                 description: The new status of the parcel
+ *     responses:
+ *       200:
+ *         description: Parcel status updated successfully
+ *       500:
+ *         description: Error while updating status of parcel
+ */
 app.put('/updateStatus', async (req, res) => {
 	const parcelID = req.body.parcelID;
 	const status = req.body.status;
@@ -294,6 +480,29 @@ app.put('/updateStatus', async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /markFailDeliveries:
+ *   put:
+ *     summary: Mark deliveries as failed if not picked up within a given number of days
+ *     tags:
+ *       - Deliveries
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               days:
+ *                 type: integer
+ *                 description: Number of days after which a parcel is marked as failed
+ *     responses:
+ *       200:
+ *         description: Number of deliveries marked as failed
+ *       500:
+ *         description: Error while marking failed deliveries
+ */
 app.put('/markFailDeliveries', async (req, res) => {
 	const days = req.body.days;
 	let failedDeliveries = 0;
@@ -329,20 +538,20 @@ app.put('/markFailDeliveries', async (req, res) => {
 						.catch(err => {
 							console.error("Error while updating status of parcel: " + err);
 						});
-					
-					const otp = Math.floor(Math.random() *9000);
+
+					const otp = Math.floor(Math.random() * 9000);
 					const values1 = {
 						lockerid: result.rows[i].lockerid,
 						compid: result.rows[i].compid,
 						otp: otp
 					}
 					axios.put('http://localhost:4002/Locker/Compartment/otp', values1)
-					.then(response => {
-						console.log(response.data.message);
-					})
-					.catch(err => {
-						console.error(err);
-					});
+						.then(response => {
+							console.log(response.data.message);
+						})
+						.catch(err => {
+							console.error(err);
+						});
 
 					failedDeliveries++;
 				}
@@ -355,6 +564,26 @@ app.put('/markFailDeliveries', async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /failedDelivery/ParcelToBring/Details:
+ *   get:
+ *     summary: Retrieve details of failed deliveries for rider to bring back
+ *     tags:
+ *       - Deliveries
+ *     parameters:
+ *       - in: query
+ *         name: trackingID
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Tracking ID of the rider
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved failed delivery details
+ *       500:
+ *         description: Error while getting failed delivery details
+ */
 app.get('/failedDelivery/ParcelToBring/Details', async (req, res) => {
 	const trackingID = req.query.trackingID;
 
@@ -369,6 +598,32 @@ app.get('/failedDelivery/ParcelToBring/Details', async (req, res) => {
 
 });
 
+/**
+ * @swagger
+ * /updateTimestamp:
+ *   put:
+ *     summary: Update a specific timestamp entry
+ *     tags:
+ *       - Timestamps
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               column:
+ *                 type: string
+ *                 description: The column name to update
+ *               stampid:
+ *                 type: integer
+ *                 description: The ID of the timestamp record
+ *     responses:
+ *       200:
+ *         description: Timestamp updated successfully
+ *       500:
+ *         description: Error while updating timestamp
+ */
 app.put('/updateTimestamp', async (req, res) => {
 	const column = req.body.column;
 	const stampid = req.body.stampid;
@@ -385,6 +640,29 @@ app.put('/updateTimestamp', async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /updateTimestamp/reAttempt:
+ *   put:
+ *     summary: Update the timestamp for a reattempted delivery
+ *     tags:
+ *       - Timestamps
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               stampid:
+ *                 type: integer
+ *                 description: The ID of the timestamp record
+ *     responses:
+ *       200:
+ *         description: Reattempt timestamp updated successfully
+ *       500:
+ *         description: Error while updating reattempt timestamp
+ */
 app.put('/updateTimestamp/reAttempt', async (req, res) => {
 	const stampid = req.body.stampid;
 
@@ -400,51 +678,113 @@ app.put('/updateTimestamp/reAttempt', async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /checkEligibility/ReDelivery:
+ *   get:
+ *     summary: Check eligibility for redelivery of a failed parcel
+ *     tags:
+ *       - Parcels
+ *     parameters:
+ *       - in: query
+ *         name: trackingID
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Receiver's tracking ID
+ *     responses:
+ *       200:
+ *         description: Eligibility check completed
+ *       500:
+ *         description: Error while checking eligibility
+ */
 app.get('/checkEligibility/ReDelivery', async (req, res) => {
 	const trackingID = req.query.trackingID;
 	//console.log(trackingID);
 
-	const str = "select parcelid, p.stampid, p.lockerid, p.compid from (select parcelid, stampid, lockerid, compid from parcelfordelivery where receiverTrackingID='"+ trackingID +"') as p inner join timestamps t on p.stampid=t.stampid where t.failed is not null and t.reattempt is null";
+	const str = "select parcelid, p.stampid, p.lockerid, p.compid from (select parcelid, stampid, lockerid, compid from parcelfordelivery where receiverTrackingID='" + trackingID + "') as p inner join timestamps t on p.stampid=t.stampid where t.failed is not null and t.reattempt is null";
 
 	try {
 		const result = await db.query(str);
 		//console.log(result);
-		if(result.rowCount == 1)
-		{
-			res.status(200).send({message: "Eligibility Confirmed", eligible: true, stampid: result.rows[0].stampid, lockerid: result.rows[0].lockerid, compid: result.rows[0].compid, parcelid: result.rows[0].parcelid});
+		if (result.rowCount == 1) {
+			res.status(200).send({ message: "Eligibility Confirmed", eligible: true, stampid: result.rows[0].stampid, lockerid: result.rows[0].lockerid, compid: result.rows[0].compid, parcelid: result.rows[0].parcelid });
 		}
 		else {
-			res.status(200).send({message: "Eligibility Denied", eligible: false});
+			res.status(200).send({ message: "Eligibility Denied", eligible: false });
 		}
 	} catch (error) {
 		console.log("Error while checking eligibility for rescheduling" + error);
-		res.status(500).send({message: "Error while checking eligibility for rescheduling" + error});
+		res.status(500).send({ message: "Error while checking eligibility for rescheduling" + error });
 	}
 });
 
+/**
+ * @swagger
+ * /parcelForDelivery/updateLockerID:
+ *   put:
+ *     summary: Update locker ID and compartment ID for a parcel
+ *     tags:
+ *       - Parcels
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               parcelID:
+ *                 type: integer
+ *                 description: The ID of the parcel
+ *     responses:
+ *       200:
+ *         description: Locker ID and Compartment ID updated successfully
+ *       500:
+ *         description: Error while updating locker ID and compartment ID
+ */
 app.put("/parcelForDelivery/updateLockerID", (req, res) => {
-    let parcelID = req.body.parcelID;
+	let parcelID = req.body.parcelID;
 
-    const str = "update parcelForDelivery set lockerid = null, compid = null where parcelid = " + parcelID;
+	const str = "update parcelForDelivery set lockerid = null, compid = null where parcelid = " + parcelID;
 
-    db.query(str, (err, data) => {
-        if (err) {
-            return res.json("Error");
-        }
-        return res.json("Locker ID and CompID updated");
-    });
+	db.query(str, (err, data) => {
+		if (err) {
+			return res.json("Error");
+		}
+		return res.json("Locker ID and CompID updated");
+	});
 });
 
+/**
+ * @swagger
+ * /checkParcelInLocker:
+ *   get:
+ *     summary: Check if a parcel is present in a locker
+ *     tags:
+ *       - Lockers
+ *     parameters:
+ *       - in: query
+ *         name: trackingID
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Receiver's tracking ID
+ *     responses:
+ *       200:
+ *         description: Parcel details retrieved successfully
+ *       500:
+ *         description: Error while checking parcel in locker
+ */
 app.get("/checkParcelInLocker", async (req, res) => {
 	const trackingID = req.query.trackingID;
 
-	const str = "select d.lockerid, p.compid, d.address, d.city, d.province from (select lockerid, compid from parcelfordelivery where receivertrackingid = '"+ trackingID +"' and lockerid is not null) as p inner join deliverybox d on p.lockerid=d.lockerid";
+	const str = "select d.lockerid, p.compid, d.address, d.city, d.province from (select lockerid, compid from parcelfordelivery where receivertrackingid = '" + trackingID + "' and lockerid is not null) as p inner join deliverybox d on p.lockerid=d.lockerid";
 
 	try {
 		const result = await db.query(str);
 		res.status(200).send(result);
 	} catch (error) {
-		
+
 	}
 })
 
@@ -569,6 +909,94 @@ app.get('/api/parcel/:id', async (req, res) => {
 // });
 
 
+/**
+ * @swagger
+ * /L:
+ *   post:
+ *     summary: Add a new locker
+ *     tags:
+ *       - Lockers
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               address:
+ *                 type: string
+ *                 description: Locker address
+ *               city:
+ *                 type: string
+ *                 description: Locker city
+ *               province:
+ *                 type: string
+ *                 description: Locker province
+ *               small:
+ *                 type: integer
+ *                 description: Number of small compartments
+ *               medium:
+ *                 type: integer
+ *                 description: Number of medium compartments
+ *               large:
+ *                 type: integer
+ *                 description: Number of large compartments
+ *     responses:
+ *       201:
+ *         description: Data inserted successfully
+ *       500:
+ *         description: Database error
+ * 
+ *   put:
+ *     summary: Update locker details
+ *     tags:
+ *       - Lockers
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               lockerid:
+ *                 type: integer
+ *                 description: Locker ID to update
+ *               address:
+ *                 type: string
+ *                 description: Updated locker address
+ *               city:
+ *                 type: string
+ *                 description: Updated locker city
+ *               province:
+ *                 type: string
+ *                 description: Updated locker province
+ *     responses:
+ *       200:
+ *         description: Data updated successfully
+ *       500:
+ *         description: Database error
+ * 
+ *   delete:
+ *     summary: Delete a locker
+ *     tags:
+ *       - Lockers
+ *     parameters:
+ *       - in: query
+ *         name: lockerid
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the locker to delete
+ *     responses:
+ *       200:
+ *         description: Deleted successfully
+ *       400:
+ *         description: Invalid locker ID
+ *       404:
+ *         description: Locker not found
+ *       500:
+ *         description: Error while deleting locker
+ */
 
 app.post("/L", (req, res) => {
 	const data = req.body;
@@ -580,13 +1008,14 @@ app.post("/L", (req, res) => {
 			return res.status(500).json({ error: "Database error", details: err });
 		}
 		const insertedId = result.rows[0].lockerid;
-		addcompartment(insertedId, data.small, data.medium, data.large)
+		addcompartment(insertedId, data.small, data.medium, data.large);
 
-		return res.status(201).json({ message: "Data inserted successfully", result });
+		return res.status(201).json({ message: "Data inserted successfully", lockerid: insertedId });
 	});
 });
+
 app.delete("/L", (req, res) => {
-	const lockerId = req.query.lockerid;
+	const lockerId = parseInt(req.query.lockerid, 10);
 
 	if (!lockerId || isNaN(lockerId)) {
 		return res.status(400).json({ error: "Invalid locker ID" });
@@ -599,7 +1028,7 @@ app.delete("/L", (req, res) => {
 			return res.status(500).json({ error: "An error occurred while deleting the locker" });
 		}
 
-		if (result.affectedRows === 0) {
+		if (result.rowCount === 0) {
 			return res.status(404).json({ message: "Locker not found" });
 		}
 
@@ -616,28 +1045,93 @@ app.put("/L", (req, res) => {
 			console.error("Database error:", err);
 			return res.status(500).json({ error: "Database error", details: err });
 		}
-		return res.status(200).json({ message: "Data updated successfully", result });
+		return res.status(200).json({ message: "Data updated successfully" });
 	});
-
 });
+
+
+/**
+ * @swagger
+ * /compartment:
+ *   post:
+ *     summary: Add compartments to a locker
+ *     tags:
+ *       - Compartments
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               selectedType:
+ *                 type: string
+ *                 enum: [small, medium, large]
+ *                 description: The type of compartment to add
+ *               id:
+ *                 type: integer
+ *                 description: The ID of the locker
+ *               noOfCompartments:
+ *                 type: integer
+ *                 description: Number of compartments to add
+ *     responses:
+ *       200:
+ *         description: Compartments added successfully
+ *       400:
+ *         description: Invalid request parameters
+ *       500:
+ *         description: Database error
+ * 
+ *   delete:
+ *     summary: Delete a compartment
+ *     tags:
+ *       - Compartments
+ *     parameters:
+ *       - in: query
+ *         name: lockerid
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the locker whose compartment is to be deleted
+ *     responses:
+ *       200:
+ *         description: Compartment deleted successfully
+ *       400:
+ *         description: Invalid locker ID
+ *       404:
+ *         description: Compartment not found
+ *       500:
+ *         description: Error while deleting compartment
+ */
 
 app.post("/compartment", (req, res) => {
 	const { selectedType, id, noOfCompartments } = req.body;
-	console.log(selectedType)
-	if (selectedType === "small") {
-		addcompartment(id, noOfCompartments, 0, 0)
+
+	if (!selectedType || !id || !noOfCompartments || isNaN(id) || isNaN(noOfCompartments)) {
+		return res.status(400).json({ error: "Invalid request parameters" });
 	}
-	else if (selectedType === "medium") {
-		addcompartment(id, 0, noOfCompartments, 0)
+
+	console.log(selectedType);
+
+	switch (selectedType) {
+		case "small":
+			addcompartment(id, noOfCompartments, 0, 0);
+			break;
+		case "medium":
+			addcompartment(id, 0, noOfCompartments, 0);
+			break;
+		case "large":
+			addcompartment(id, 0, 0, noOfCompartments);
+			break;
+		default:
+			return res.status(400).json({ error: "Invalid compartment type" });
 	}
-	else {
-		addcompartment(id, 0, 0, noOfCompartments)
-	}
-	res.json({ message: "Added Successfully" })
+
+	res.status(200).json({ message: "Added Successfully" });
 });
 
 app.delete("/compartment", (req, res) => {
-	const lockerId = req.query.lockerid;
+	const lockerId = parseInt(req.query.lockerid, 10);
 
 	if (!lockerId || isNaN(lockerId)) {
 		return res.status(400).json({ error: "Invalid locker ID" });
@@ -646,17 +1140,18 @@ app.delete("/compartment", (req, res) => {
 	const query = "DELETE FROM compartment WHERE compid = $1";
 	db.query(query, [lockerId], (err, result) => {
 		if (err) {
-			console.error(err);
-			return res.status(500).json({ error: "An error occurred while deleting the locker" });
+			console.error("Database error:", err);
+			return res.status(500).json({ error: "An error occurred while deleting the compartment" });
 		}
 
-		if (result.affectedRows === 0) {
-			return res.status(404).json({ message: "Locker not found" });
+		if (result.rowCount === 0) {
+			return res.status(404).json({ message: "Compartment not found" });
 		}
 
 		return res.status(200).json({ message: "Deleted successfully" });
 	});
 });
+
 
 function addcompartment(lockerid, noofSmall, noofMedium, noofLarge) {
 	// Define the base query for inserting a new compartment
