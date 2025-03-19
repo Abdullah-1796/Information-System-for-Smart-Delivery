@@ -1,9 +1,10 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router";
 import Modal from "./Modal";
 import "../styles/LockerList.css";
 import "../styles/Modal.css";
+import LoadingScreen from "./LoadingScreen";
 
 function LockerList() {
     const [data, setData] = React.useState([]);
@@ -11,6 +12,7 @@ function LockerList() {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedLocker, setSelectedLocker] = useState("");
+    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         address: "",
         city: "",
@@ -30,28 +32,48 @@ function LockerList() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        setLoading(true);
         axios.post('http://localhost:4001/L', formData)
             .then(res => {
-                console.log(res.data.message);
-                loadData();
+                console.log("res is ", res);
+    
+                if (res.status === 201) { // Correct status for successful insertion
+                    console.log(res.data.message);
+                    alert(res.data.message); // Notify user
+                    loadData(); // Refresh data
+                }
             })
             .catch(err => {
-                console.log(err);
-            });
-    };
+                console.error("Error:", err);
+                if (err.response && err.response.status === 400) {
+                    alert(err.response.data.error || "A locker with this address and city already exists.");
+                } else {
+                    alert("An error occurred. Please try again.");
+                }
+            })
+            .finally(() => {
+                setLoading(false);
+                setisAddModalOpen(false);
+            }); // Ensure loading state is updated
+    };    
 
     function loadData() {
+        setLoading(true);
         axios.get("http://localhost:4002/")
             .then(res => {
-                setData(res.data.rows);
+                setData(res.data);
                 //console.log(res.data.rows);
             })
             .catch(error => {
                 console.log(`Error while fecthing lockers ${error}`);
+            })
+            .finally(() => {
+                setLoading(false);
             });
     }
 
     const handleDelete = () => {
+        setLoading(true);
         axios.delete(`http://localhost:4001/L`, {
             params: { lockerid: selectedLocker },
         })
@@ -61,6 +83,9 @@ function LockerList() {
             })
             .catch(err => {
                 console.error(err);
+            })
+            .finally(() => {
+                setLoading(false);
             });
     };
 
@@ -74,6 +99,7 @@ function LockerList() {
         setIsEditModalOpen(true);
     };
     const handleEdit = () => {
+        setLoading(true);
         const data = { ...formData, lockerid: selectedLocker.lockerid };
         axios.put(`http://localhost:4001/L`, data)
             .then(res => {
@@ -82,6 +108,9 @@ function LockerList() {
             })
             .catch(err => {
                 console.error(err);
+            })
+            .finally(() => {
+                setLoading(false);
             });
     };
 
@@ -89,6 +118,18 @@ function LockerList() {
     React.useEffect(() => {
         loadData();
     }, []);
+    if (loading) {
+        return (
+            <div style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100vh"
+            }}>
+                <LoadingScreen />
+            </div>
+        );
+    }
     return (
         <>
             <div id="Bar">

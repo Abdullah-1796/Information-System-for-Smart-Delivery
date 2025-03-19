@@ -998,20 +998,35 @@ app.get('/api/parcel/:id', async (req, res) => {
  *         description: Error while deleting locker
  */
 
-app.post("/L", (req, res) => {
-	const data = req.body;
-	const str = `INSERT INTO deliveryBox ("address", "city", "province") VALUES ($1, $2, $3) RETURNING "lockerid"`;
+app.post("/L", async (req, res) => {
+  try {
+    const data = req.body;
 
-	db.query(str, [data.address, data.city, data.province], (err, result) => {
-		if (err) {
-			console.error("Database error:", err);
-			return res.status(500).json({ error: "Database error", details: err });
-		}
-		const insertedId = result.rows[0].lockerid;
-		addcompartment(insertedId, data.small, data.medium, data.large);
+    // First, check if the record already exists
+    const checkQuery = `SELECT lockerid FROM deliveryBox WHERE address = $1 AND city = $2`;
+    const existingRecord = await db.query(checkQuery, [data.address, data.city]);
 
-		return res.status(201).json({ message: "Data inserted successfully", lockerid: insertedId });
-	});
+    if (existingRecord.rows.length > 0) {
+			console.log(existingRecord.rows);
+			
+      return res.status(400).json({ error: "A locker with this address and city already exists." });
+    }
+
+    // If no existing record, insert new data
+    const insertQuery = `INSERT INTO deliveryBox ("address", "city", "province") VALUES ($1, $2, $3) RETURNING "lockerid"`;
+    const result = await db.query(insertQuery, [data.address, data.city, data.province]);
+
+    const insertedId = result.rows[0].lockerid;
+
+    // Call function to add compartments
+    addcompartment(insertedId, data.small, data.medium, data.large);
+
+    return res.status(201).json({ message: "Data inserted successfully", lockerid: insertedId });
+
+  } catch (err) {
+    console.error("Database error:", err);
+    return res.status(500).json({ error: "Database error", details: err });
+  }
 });
 
 app.delete("/L", (req, res) => {
