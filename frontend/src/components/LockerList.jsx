@@ -169,7 +169,7 @@ function LockerList() {
             {Object.entries(groupedLockers).map(([key, lockers]) => (
                 <div key={key} className="town-group">
                     <h2
-                        style={{ cursor: "pointer", padding: "10px", borderRadius: "10px", backgroundColor: "#D1B09F",margin:"2%" }}
+                        style={{ cursor: "pointer", padding: "10px", borderRadius: "10px", backgroundColor: "#b9e5e8",margin:"2%", }}
                         onClick={() => setCollapsed(prev => ({ ...prev, [key]: !prev[key] }))}
                     >
                         {key} {collapsed[key] ? "▼" : "▲"}
