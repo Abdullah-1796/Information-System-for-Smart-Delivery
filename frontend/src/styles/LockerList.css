@@ -31,12 +31,15 @@
 #Bar {
     display: flex;
     justify-content: flex-end;
+    /* position: fixed; */
+    /* top:10; */
     align-items: center;
     background-color: rgb(20,47,68);
     border-radius: 40px;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     margin-bottom: 20px;
     margin-top: 20px;
+    width: 100%;
     padding: 10px;
 }
 

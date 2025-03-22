@@ -1305,3 +1305,25 @@ app.get("/getPendingParcels",async (req,res) =>{
     res.status(500).json({ success: false, message: "Database error" });
 	}
 });
+
+app.get("/getPlacedParcels",async (req,res) =>{
+	try{
+		const query=`select * from parcelForDelivery where status= 'parcelPlaced'`
+		const { rows } = await db.query(query); // Pass both parameters
+    res.json({ success: true, data: rows });
+	}catch(error){
+		console.error("Error getting Delivery Boxes: ", error);
+    res.status(500).json({ success: false, message: "Database error" });
+	}
+});
+
+app.get("/getDeliveredParcels",async (req,res) =>{
+	try{
+		const query=`select * from parcelForDelivery where status= 'deliveredparcels'`
+		const { rows } = await db.query(query); // Pass both parameters
+    res.json({ success: true, data: rows });
+	}catch(error){
+		console.error("Error getting Delivery Boxes: ", error);
+    res.status(500).json({ success: false, message: "Database error" });
+	}
+});

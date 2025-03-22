@@ -41,6 +41,7 @@ const AdminHome = () => {
   const [loading, setLoading] = useState(false); // State to handle loading state
   const [error, setError] = useState(null); // State to handle errors
   const [showtable,setShowtable] = useState(false);
+  const [status, setStatus] = useState("pending");
   function handleCheckboxChange(index) {
     const updatedData = [...data];
     updatedData[index].selected = !updatedData[index].selected;
@@ -90,7 +91,8 @@ const AdminHome = () => {
             alert("No updates available.");
             return;
           }
-
+          setParcels(fetchedData); // Update state with fetched data
+          setShowtable(true); // Show the table
           // Format data properly for confirmation popup
           const formattedData = fetchedData
             .map(
@@ -101,16 +103,16 @@ const AdminHome = () => {
             )
             .join("\n\n");
 
-          // Show formatted data in confirm box
-          if (
-            window.confirm(
-              `Fetched ${fetchedData.length} row(s):\n\n${formattedData}\n\nDo you want to proceed?`
-            )
-          ) {
-            // alert("User confirmed!");
-          } else {
-            // alert("User canceled!");
-          }
+          // // Show formatted data in confirm box
+          // if (
+          //   window.confirm(
+          //     `Fetched ${fetchedData.length} row(s):\n\n${formattedData}\n\nDo you want to proceed?`
+          //   )
+          // ) {
+          //   // alert("User confirmed!");
+          // } else {
+          //   // alert("User canceled!");
+          // }
         }
       })
       .catch((err) => {
@@ -150,7 +152,7 @@ const AdminHome = () => {
   const getPendingParcels = async () => {
     setLoading(true); // Set loading to true
     setError(null); // Reset any previous errors
-
+    setStatus("Pending");
     try {
       // Call the API using Axios
       const response = await axios.get("http://localhost:4001/getPendingParcels");
@@ -170,20 +172,72 @@ const AdminHome = () => {
     }
   };
 
+  const getPlacedParcels = async () => {
+    setLoading(true); // Set loading to true
+    setError(null); // Reset any previous errors
+    setStatus("Placed");
+    try {
+      // Call the API using Axios
+      const response = await axios.get("http://localhost:4001/getPlacedParcels");
+
+      if (response.data.success) {
+        setParcels(response.data.data); // Update state with fetched data
+        setShowtable(true); // Show the table
+        // console.log("Data is:", response.data.data);
+      } else {
+        throw new Error(response.data.message || "Failed to fetch data");
+      }
+    } catch (error) {
+      console.error("Error fetching Selection Done parcels:", error);
+      setError(error.message); // Set error message
+    } finally {
+      setLoading(false); // Set loading to false
+    }
+  };
+
+  const getDeliveredParcels = async () => {
+    setLoading(true); // Set loading to true
+    setError(null); // Reset any previous errors
+    setStatus("Delivered Parcels");
+    try {
+      // Call the API using Axios
+      const response = await axios.get("http://localhost:4001/getDeliveredParcels");
+
+      if (response.data.success) {
+        setParcels(response.data.data); // Update state with fetched data
+        setShowtable(true); // Show the table
+        // console.log("Data is:", response.data.data);
+      } else {
+        throw new Error(response.data.message || "Failed to fetch data");
+      }
+    } catch (error) {
+      console.error("Error fetching Delivered parcels:", error);
+      setError(error.message); // Set error message
+    } finally {
+      setLoading(false); // Set loading to false
+    }
+  };
   return (
     <div id="adminHomeBody">
+      <h1 style={{position:"fixed",top:50}}>Admin Home Page</h1>
       <div id="adminHomeButtonView" style={{ display: "flex" }}>
         <button onClick={postUpdates} className="adminButton">
-          Post Updates
+          Post Parcels
         </button>
         <button onClick={getUpdates} className="adminButton">
-          Get Updates
+          Get Updated Parcels
         </button>
         <button onClick={markFailDeliveries} className="adminButton">
           Mark Fail Deliveries
         </button>
         <button onClick={getPendingParcels} className="adminButton">
           Get Pending Parcels
+        </button>
+        <button onClick={getPlacedParcels} className="adminButton">
+          Placed in Box
+        </button>
+        <button onClick={getDeliveredParcels} className="adminButton">
+          Parcels Delivered
         </button>
       </div>
       {showPopup && (
@@ -280,7 +334,7 @@ const AdminHome = () => {
         )}
 
         {parcels.length === 0 && !loading && !error && (
-          <p>No pending parcels found.</p>
+          <p>No {status} parcels found.</p>
         )}
       </div>}
     </div>
