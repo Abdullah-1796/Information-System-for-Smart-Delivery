@@ -1,0 +1,82 @@
+#userHome-container h1 {
+    font-family: "Pacifico", cursive;
+    font-size: 300%;
+    margin: 0 0 0 2%;
+}
+
+#userHome-container {
+	background-image: url('../../public/images/gradient1.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin: 0;
+    padding-bottom: 1%;
+}
+
+#userHome-container #main-container {
+    height: 100%;
+    background-color: #EDE8DC;
+    padding: 2%;
+    margin: 2%;
+    border-radius: 45px;
+}
+
+.goal-container {
+    display: flex;
+    background-color: #E7CCCC;
+    border-radius: 35px;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    margin-bottom: 5%;
+}
+
+#userHome-container .img {
+    width: 650px;
+    margin: 2%;
+    /* background-color: blue; */
+    display: flex;
+    align-items: center;
+
+}
+
+#userHome-container img {
+    width: 100%;
+    border-radius: 25px;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
+
+.detail {
+    font-size: 135%;
+    margin: 2%;
+    font-family: "Public Sans", sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#userHome-container .heading {
+    font-family: "Pacifico", cursive;
+    font-size: 220%;
+    margin: 0;
+    font-weight: bold;
+    margin-bottom: 2%;
+}
+
+.reverse {
+    flex-direction: row-reverse;
+}
+
+#customer-care-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    width: 6%;
+    right: 1%;
+    bottom: 1%;
+    background-color: white;
+    border-radius: 50px;
+    box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+}
+
+#customer-care-btn > img {
+    border-radius: 50px;
+}

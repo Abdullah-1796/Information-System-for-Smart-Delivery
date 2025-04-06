@@ -12,6 +12,7 @@ import FailedParcelDetail from './components/FailedParcelDetail';
 import ReceiverHome from './components/ReceiverHome';
 import ReScheduleDelivery from './components/ReScheduleDelivery';
 import SendParcel from './components/SendParcel';
+import UserHome from './components/UserHome';
 
 function App() {
 	return (
@@ -21,6 +22,7 @@ function App() {
 				<Route exact path="/LockerList" element={<LockerList />} />
 				<Route exact path="/Locker/:id" element={<Locker />} />
 				<Route exact path="/AdminHome" element={<AdminHome />} />
+				<Route exact path="/UserHome" element={<UserHome />} />
 				<Route exact path="/ReceiverHome" element={<ReceiverHome />} />
 				<Route exact path="/SelectLocker" element={<SelectLocker />} />
 				<Route exact path="/ReScheduleDelivery" element={<ReScheduleDelivery />} />
@@ -29,7 +31,7 @@ function App() {
 				<Route exact path="/ParcelReceivingDetail" element={<ParcelReceivingDetail />} />
 				<Route exact path="/FailedParcelDetail" element={<FailedParcelDetail />} />
 				<Route exact path="/SendParcel" element={<SendParcel/>}/>
-				<Route path="*" element={<Navigate to="/" />} />
+				<Route path="*" element={<Navigate to="/UserHome" />} />
 			</Routes>
 		</Router>
 	);

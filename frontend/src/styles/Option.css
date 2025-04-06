@@ -1,0 +1,15 @@
+.option1 {
+    display: flex;
+    flex-shrink: 0;
+    background-color: #E7CCCC;
+    width: 120px;
+    height: 120px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-radius: 25px;
+    margin: 4px 0;
+    box-shadow: rgba(149, 157, 165, 0.137) 0px 8px 24px;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
+}
