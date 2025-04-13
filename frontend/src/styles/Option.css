@@ -12,4 +12,5 @@
     box-shadow: rgba(149, 157, 165, 0.137) 0px 8px 24px;
     box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
     box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
+    cursor: pointer;
 }

@@ -1,3 +1,6 @@
+body {
+	font-family: 'Public Sans', cursive !important;
+}
 #adminHome-container {
 	background-image: url('../../public/images/gradient1.png');
 	height: 100vh;

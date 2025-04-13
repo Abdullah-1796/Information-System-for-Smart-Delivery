@@ -1,0 +1,106 @@
+#select-locker-container {
+    width: 100;
+    height: 100vh;
+	background-image: url('../../public/images/gradient1.png');
+}
+
+#select-locker-container h1 {
+    font-family: 'Pacifico', cursive;
+    margin: 0 2%;
+    font-size: 300%;
+}
+
+#trackingID-input {
+    display: flex;
+    margin: 0 20%;
+    background-color: #123458;
+    padding: 0.5%;
+    gap: 1%;
+    justify-content: center;
+    align-items: center;
+    border-radius: 30px;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+#trackingID-input > #button {
+    width: 30%;
+    height: 60px;
+    display: flex;
+    margin: 0;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 25px;
+    font-weight: bold;
+    background-color: #EDE8DC;
+}
+
+#trackingID-input > input {
+    margin: 0;
+    height: 40px;
+    border-radius: 25px;
+    font-size: large;
+    padding-left: 2%;
+}
+
+#select-locker {
+    background-color: antiquewhite;
+    margin: 2%;
+    padding: 2%;
+    height: 73%;
+	background-color: rgba(255, 255, 255, 0.585);
+	backdrop-filter: blur(30px);
+    border-radius: 30px;
+}
+
+#select-locker h1 {
+    font-size: 200%;
+    padding: 0;
+    margin-top: 1%;
+    margin-bottom: 1%;
+    font-weight: 500;
+}
+
+#locker-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    overflow-x: auto;
+    height: 70%;
+    /* background-color: #123458; */
+    border-radius: 25px;
+}
+
+#locker-list::-webkit-scrollbar {
+    width: 5px;
+}
+
+#locker-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#locker-list::-webkit-scrollbar-thumb {
+    background-color: #999;
+    border-radius: 10px;
+}
+
+#locker-option {
+    width: 420px;
+    display: flex;
+    background-color: #A5B68D;
+    border-radius: 25px;
+    padding: 10px;
+    margin: 1%;
+    cursor: pointer;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+}
+
+#locker-option img {
+    width: 120px;
+    border-radius: 25px;
+}
+
+#locker-option #detail {
+    margin-left: 10px;
+}

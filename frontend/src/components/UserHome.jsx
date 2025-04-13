@@ -1,22 +1,16 @@
 import React from "react";
 import "../styles/UserHome.css";
 import UserFloatingTray from "./UserFloatingTray";
+import CustomerCareButton from "./CustomerCareButton";
 
 function UserHome() {
 
-    function openWhatsapp() {
-        const phoneNumber = "923227888444";
-        const message = "Hi, I need your assistance, anyone there to guide me please?";
-        const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-        window.open(url, "_blank");
-    }
+    
     
     return (
         <div id="userHome-container">
             <UserFloatingTray />
-            <div id="customer-care-btn" onClick={openWhatsapp}>
-                <img src="./images/customer-service.png" />
-            </div>
+            <CustomerCareButton />
             <h1>Smart Delivery</h1>
             <div id="main-container">
                 <div className="goal-container reverse" style={{backgroundColor: "#C1CFA1"}}>
