@@ -52,8 +52,8 @@ function UserFloatingTray() {
                     <Option
                         backgroundColor="#3C3D37"
                         color="white"
-                        label="Select Locker"
-                        link="/SelectLocker"
+                        label="Parcel Delivery Detail"
+                        link="/ParcelDeliveryDetail"
                     />
                     <Option
                         backgroundColor="#123458"
