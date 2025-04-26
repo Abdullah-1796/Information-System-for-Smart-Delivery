@@ -262,6 +262,12 @@ function AdminFloatingTray() {
                     <Option
                         backgroundColor="#697565"
                         color="white"
+                        label="Old Admin Home"
+                        link="/AdminHomeOld"
+                    />
+                    <Option
+                        backgroundColor="#697565"
+                        color="white"
                         label="Get Updated Parcels"
                         link=""
                     />

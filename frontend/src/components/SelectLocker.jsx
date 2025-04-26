@@ -41,13 +41,25 @@ function SelectLocker() {
         const value = {
             trackingID: trackingID,
         }
-        axios.get('http://localhost:4001/availableLockers', { params: value })
+        axios.get('http://localhost:4001/checkEligibility/Delivery', { params: value })
             .then(res => {
-                console.log(res.data.rows);
-                setData(res.data.rows);
+                if (res.status == 200 && res.data.eligible) {
+
+                    axios.get('http://localhost:4001/availableLockers', { params: value })
+                        .then(res => {
+                            console.log(res.data.rows);
+                            setData(res.data.rows);
+                        })
+                        .catch(err => {
+                            console.error("Error while fetching available lockers: " + err);
+                        });
+                }
+                else {
+                    alert("Not eligible to make scheduling event!");
+                }
             })
             .catch(err => {
-                console.error("Error while fetching available lockers: " + err);
+                console.log("Error while checking for eligibility: " + err);
             });
     }
 
@@ -70,7 +82,7 @@ function SelectLocker() {
                     {
                         data.map((d, i) => (
                             <div id="locker-option">
-                                <img src="./images/maps.jpg" onClick={() => {openMaps(d.address)}}/>
+                                <img src="./images/maps.jpg" onClick={() => { openMaps(d.address) }} />
                                 <div id="detail" onClick={() => { reserveLocker(d.lockerid, d.compcategoryid, d.parcelid) }}>
 
                                     <h2>{d.address + " " + (i + 1)} </h2>
