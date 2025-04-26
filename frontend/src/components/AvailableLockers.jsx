@@ -4,19 +4,19 @@ import axios from "axios";
 function AvailableLockers({ city, parcelDetails, onLockerSelect }) {
   const [lockers, setLockers] = useState([]);
   const [selectedLocker, setSelectedLocker] = useState("");
-  const [compId,setCompId]=useState();
-  const [compcategoryid,setCompCategory]=useState("");
+  const [compId, setCompId] = useState();
+  const [compcategoryid, setCompCategory] = useState("");
   const [loading, setLoading] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchAvailableLockers = async () => {
-      if (!city||!compcategoryid){ 
+      if (!city || !compcategoryid) {
         alert("Select City and Weight of the parcel to get the available delivery boxes.")
         return;
       } // Prevent unnecessary API calls
-      console.log("detail is ",compcategoryid," ",city);
-      
+      console.log("detail is ", compcategoryid, " ", city);
+
       setLoading("loading");
       try {
         const response = await axios.get(`http://localhost:4001/getlockers?city=${city}&compcategoryid=${compcategoryid}`);
@@ -28,7 +28,7 @@ function AvailableLockers({ city, parcelDetails, onLockerSelect }) {
           alert("Sorry, this option is not available in your location. Please try another city.");
         }
         setLockers(response.data.data); // Correct access to `data`
-        setError(""); 
+        setError("");
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch lockers");
         setLockers([]); // Ensure lockers is always an array
@@ -37,34 +37,42 @@ function AvailableLockers({ city, parcelDetails, onLockerSelect }) {
       }
     };
 
-    if(compcategoryid!==""){
-      console.log("weight is ",parcelDetails.parcelWeight);
+    if (compcategoryid !== "") {
+      console.log("weight is ", compcategoryid);
       fetchAvailableLockers();
     }
   }, [compcategoryid]);
-  useEffect(()=>{
-    setCompCategory(parcelDetails.parcelWeight === "small" ? 1 : parcelDetails.parcelWeight === "medium" ? 2 : "large"?3:"");
-  },[parcelDetails.parcelWeight]);
 
-  const handleLockerSelection = async (lockerId,compId) => {
+  useEffect(() => {
+
+
+    setCompCategory(
+      parcelDetails.parcelWeight === "small" ? 1 :
+        parcelDetails.parcelWeight === "medium" ? 2 :
+          parcelDetails.parcelWeight === "large" ? 3 :
+            ""
+    );
+  }, [parcelDetails.parcelWeight]);
+
+  const handleLockerSelection = async (lockerId, compId) => {
     setSelectedLocker(lockerId);
-    onLockerSelect(lockerId,compId); // Notify parent component
+    onLockerSelect(lockerId, compId); // Notify parent component
     setLockers([]);
     setLoading("selected");
-    console.log("lockers are ",lockers);
+    console.log("lockers are ", lockers);
   };
   useEffect(() => {
     console.log("Updated lockers state:", lockers);
-  }, [lockers,loading]); // Runs when lockers state changes
-  
+  }, [lockers, loading]); // Runs when lockers state changes
+
   return (
     <div style={{ display: "flex", flexDirection: "column", margin: "0px 100px", alignItems: "center" }}>
       <h3>Available Lockers</h3>
 
-      {loading &&loading==='loading'&& <p>Loading lockers...</p>}
-      {loading&&loading==='selected'&&<p>Locker selected</p>}
+      {loading && loading === 'loading' && <p>Loading lockers...</p>}
+      {loading && loading === 'selected' && <p>Locker selected</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
-      {loading==="" && lockers.length === 0 && <p>No lockers available in {city}</p>}
+      {loading === "" && lockers.length === 0 && <p>No lockers available in {city}</p>}
 
       <div>
         {lockers.map((d, i) => (
@@ -89,7 +97,7 @@ function AvailableLockers({ city, parcelDetails, onLockerSelect }) {
               e.target.style.backgroundColor = "lightblue";
               e.target.style.transform = "scale(1)";
             }}
-            onClick={() => handleLockerSelection(d.lockerid,d.compid)}
+            onClick={() => handleLockerSelection(d.lockerid, d.compid)}
           >
             <h2>{d.address + " " + (i + 1)}</h2>
             <h3>{d.city}</h3>

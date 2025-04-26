@@ -114,8 +114,7 @@ const SendParcel = () => {
       riderTrackingID: id + 2,
       lockerID: selectedLocker,
       compID: compID,
-      status: "Pending",
-      stampid: null,
+      status: "selectionDone",
     };
   
     try {

@@ -13,28 +13,28 @@ function SelectLocker() {
     }
 
     function reserveLocker(lockerID, compCategoryID, parcelID) {
-        // console.log(lockerID);
-        // const value = {
-        //     lockerID: lockerID,
-        //     compCategoryID: compCategoryID,
-        //     trackingID: trackingID,
-        //     parcelID: parcelID
-        // }
-        // axios.post('http://localhost:4001/reserveLocker', value)
-        //     .then(res => {
-        //         //console.log(res.data);
-        //         if (res.status == 200) {
-        //             alert("Locker Successfully Reserved");
-        //             setData([]);
-        //             setTrackingID([]);
-        //         }
-        //         else {
-        //             alert(res.data);
-        //         }
-        //     })
-        //     .catch(err => {
-        //         console.error("Error while reserving available lockers: " + err);
-        //     });
+        console.log(lockerID);
+        const value = {
+            lockerID: lockerID,
+            compCategoryID: compCategoryID,
+            trackingID: trackingID,
+            parcelID: parcelID
+        }
+        axios.post('http://localhost:4001/reserveLocker', value)
+            .then(res => {
+                //console.log(res.data);
+                if (res.status == 200) {
+                    alert("Locker Successfully Reserved");
+                    setData([]);
+                    setTrackingID([]);
+                }
+                else {
+                    alert(res.data);
+                }
+            })
+            .catch(err => {
+                console.error("Error while reserving available lockers: " + err);
+            });
     }
 
     function findLockers() {

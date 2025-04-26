@@ -371,7 +371,7 @@ app.post('/reserveLocker', async (req, res) => {
 				throw (err);
 			});
 
-		//updating status of compartment in locker to Reserved
+		//updating parcelid of compartment in locker to Reserved
 		const values2 = {
 			lockerid: lockerID,
 			compid: compid,
@@ -999,34 +999,34 @@ app.get('/api/parcel/:id', async (req, res) => {
  */
 
 app.post("/L", async (req, res) => {
-  try {
-    const data = req.body;
+	try {
+		const data = req.body;
 
-    // First, check if the record already exists
-    const checkQuery = `SELECT lockerid FROM deliveryBox WHERE address = $1 AND city = $2`;
-    const existingRecord = await db.query(checkQuery, [data.address, data.city]);
+		// First, check if the record already exists
+		const checkQuery = `SELECT lockerid FROM deliveryBox WHERE address = $1 AND city = $2`;
+		const existingRecord = await db.query(checkQuery, [data.address, data.city]);
 
-    if (existingRecord.rows.length > 0) {
+		if (existingRecord.rows.length > 0) {
 			console.log(existingRecord.rows);
-			
-      return res.status(400).json({ error: "A locker with this address and city already exists." });
-    }
 
-    // If no existing record, insert new data
-    const insertQuery = `INSERT INTO deliveryBox ("address", "city", "province") VALUES ($1, $2, $3) RETURNING "lockerid"`;
-    const result = await db.query(insertQuery, [data.address, data.city, data.province]);
+			return res.status(400).json({ error: "A locker with this address and city already exists." });
+		}
 
-    const insertedId = result.rows[0].lockerid;
+		// If no existing record, insert new data
+		const insertQuery = `INSERT INTO deliveryBox ("address", "city", "province") VALUES ($1, $2, $3) RETURNING "lockerid"`;
+		const result = await db.query(insertQuery, [data.address, data.city, data.province]);
 
-    // Call function to add compartments
-    addcompartment(insertedId, data.small, data.medium, data.large);
+		const insertedId = result.rows[0].lockerid;
 
-    return res.status(201).json({ message: "Data inserted successfully", lockerid: insertedId });
+		// Call function to add compartments
+		addcompartment(insertedId, data.small, data.medium, data.large);
 
-  } catch (err) {
-    console.error("Database error:", err);
-    return res.status(500).json({ error: "Database error", details: err });
-  }
+		return res.status(201).json({ message: "Data inserted successfully", lockerid: insertedId });
+
+	} catch (err) {
+		console.error("Database error:", err);
+		return res.status(500).json({ error: "Database error", details: err });
+	}
 });
 
 app.delete("/L", (req, res) => {
@@ -1214,116 +1214,267 @@ function addcompartment(lockerid, noofSmall, noofMedium, noofLarge) {
 
 // Route to add a new parcel for the Sender
 app.post("/sendParcel", async (req, res) => {
-  try {
-    const {
-      itemName,
-      sname,
-      sphone,
-      semail,
-      rname,
-      rphone,
-      remail,
-      address,
-      city,
-      province,
-      dimensionID,
-      receiverTrackingID,
-      riderTrackingID,
-      lockerID,
-      compID,
-      status,
-      stampid,
-    } = req.body;
+	try {
+		const {
+			itemName,
+			sname,
+			sphone,
+			semail,
+			rname,
+			rphone,
+			remail,
+			address,
+			city,
+			province,
+			dimensionID,
+			receiverTrackingID,
+			riderTrackingID,
+			lockerID,
+			compID,
+			status
+		} = req.body;
 
-    const query = `
-      INSERT INTO SendParcel (
-        itemName, sname, sphone, semail, rname, rphone, remail, address, city, 
-        province, dimensionID, receiverTrackingID, riderTrackingID, lockerID, compID, status, stampid
-      ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17
-      ) RETURNING *;
-    `;
+		// Step 1: Insert timestamp and get stampid
+		const insertTimestampQuery = `INSERT INTO timestamps (selection) VALUES (NOW());`;
+		await db.query(insertTimestampQuery);
 
-    const values = [
-      itemName,
-      sname,
-      sphone,
-      semail,
-      rname,
-      rphone,
-      remail,
-      address,
-      city,
-      province,
-      dimensionID,
-      receiverTrackingID,
-      riderTrackingID,
-      lockerID,
-      compID,
-      status,
-      stampid,
-    ];
 
-    const result = await db.query(query, values);
-    res.status(201).json({ success: true, data: result.rows[0] });
+		// Step 2: Get latest stampid
+		const getStampIdQuery = `SELECT stampid FROM timestamps ORDER BY stampid DESC LIMIT 1;`;
+		const stampResult = await db.query(getStampIdQuery);
+		const stampid = stampResult.rows[0].stampid;
 
-  } catch (error) {
-    console.error("Error inserting parcel:", error);
-    res.status(500).json({ success: false, message: "Database error" });
-  }
+		// Step 3: Insert parcel info with stampid
+		const parcelQuery = `
+		INSERT INTO SendParcel (
+		  itemName, sname, sphone, semail, rname, rphone, remail, address, city, 
+		  province, dimensionID, receiverTrackingID, riderTrackingID, lockerID, compID, status, stampid
+		) VALUES (
+		  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17
+		) RETURNING *;
+	  `;
+
+		const values = [
+			itemName,
+			sname,
+			sphone,
+			semail,
+			rname,
+			rphone,
+			remail,
+			address,
+			city,
+			province,
+			dimensionID,
+			receiverTrackingID,
+			riderTrackingID,
+			lockerID,
+			compID,
+			status,
+			stampid,
+		];
+
+		const result = await db.query(parcelQuery, values);
+		const parcelID = result.rows[0].parcelid;
+
+		//updating status of compartment in locker to Reserved
+		await updateCompartment(lockerID, compID, parcelID);
+
+		res.status(201).json({ success: true, data: result.rows[0] });
+
+	} catch (error) {
+		console.error("Error inserting parcel with timestamp:", error);
+		res.status(500).json({ success: false, message: "Database error" });
+	}
 });
+
 
 //route to get parcel lockers based on city
 app.get("/getlockers", async (req, res) => {
-  try {
-    const { city, compcategoryid } = req.query; // Get both query parameters
-    if (!city || !compcategoryid) {
-      return res.status(400).json({ success: false, message: "City and compcategoryid are required" });
-    }
+	try {
+		const { city, compcategoryid } = req.query; // Get both query parameters
+		if (!city || !compcategoryid) {
+			return res.status(400).json({ success: false, message: "City and compcategoryid are required" });
+		}
 
-    const query = `SELECT * FROM deliveryBox d 
+		const query = `SELECT * FROM deliveryBox d 
                    INNER JOIN compartment c 
                    ON d.lockerID = c.lockerID 
                    WHERE d.city = $1 AND c.compcategoryid = $2`;
 
-    const { rows } = await db.query(query, [city, compcategoryid]); // Pass both parameters
+		const { rows } = await db.query(query, [city, compcategoryid]); // Pass both parameters
 
-    res.json({ success: true, data: rows });
-  } catch (error) {
-    console.error("Error getting Delivery Boxes: ", error);
-    res.status(500).json({ success: false, message: "Database error" });
-  }
-});
-
-app.get("/getPendingParcels",async (req,res) =>{
-	try{
-		const query=`select * from parcelForDelivery where status= 'selectionPending'`
-		const { rows } = await db.query(query); // Pass both parameters
-    res.json({ success: true, data: rows });
-	}catch(error){
+		res.json({ success: true, data: rows });
+	} catch (error) {
 		console.error("Error getting Delivery Boxes: ", error);
-    res.status(500).json({ success: false, message: "Database error" });
+		res.status(500).json({ success: false, message: "Database error" });
 	}
 });
 
-app.get("/getPlacedParcels",async (req,res) =>{
-	try{
-		const query=`select * from parcelForDelivery where status= 'parcelPlaced'`
+app.get("/getPendingParcels", async (req, res) => {
+	try {
+		const query = `select * from parcelForDelivery where status= 'selectionPending'`
 		const { rows } = await db.query(query); // Pass both parameters
-    res.json({ success: true, data: rows });
-	}catch(error){
+		res.json({ success: true, data: rows });
+	} catch (error) {
 		console.error("Error getting Delivery Boxes: ", error);
-    res.status(500).json({ success: false, message: "Database error" });
+		res.status(500).json({ success: false, message: "Database error" });
 	}
 });
 
-app.get("/getDeliveredParcels",async (req,res) =>{
-	try{
-		const query=`select * from parcelForDelivery where status= 'deliveredparcels'`
+app.get("/getPlacedParcels", async (req, res) => {
+	try {
+		const query = `select * from parcelForDelivery where status= 'parcelPlaced'`
 		const { rows } = await db.query(query); // Pass both parameters
-    res.json({ success: true, data: rows });
-	}catch(error){
+		res.json({ success: true, data: rows });
+	} catch (error) {
 		console.error("Error getting Delivery Boxes: ", error);
-    res.status(500).json({ success: false, message: "Database error" });
+		res.status(500).json({ success: false, message: "Database error" });
 	}
+});
+
+app.get("/getDeliveredParcels", async (req, res) => {
+	try {
+		const query = `select * from parcelForDelivery where status= 'deliveredparcels'`
+		const { rows } = await db.query(query); // Pass both parameters
+		res.json({ success: true, data: rows });
+	} catch (error) {
+		console.error("Error getting Delivery Boxes: ", error);
+		res.status(500).json({ success: false, message: "Database error" });
+	}
+});
+
+app.get("/", async (req, res) => {
+	try {
+		const result = await db.query("SELECT * FROM timestamps");
+		res.status(200).json(result.rows);
+	} catch (err) {
+		console.error("Database query error:", err);
+		res.status(500).json({ error: "Internal server error" });
+	}
+});
+
+app.get('/parcelToReceive/Details', async (req, res) => {
+	const trackingID = req.query.trackingID;
+
+	const str = "select p.lockerid, p.compid, p.itemname, p.sname, p.rname, p.address, p.city, p.province, c.otp from (select lockerid, compid, itemname, sname, rname, address, city, province, status from SendParcel where ridertrackingid = '" + trackingID + "') as p inner join compartment c on p.lockerid=c.lockerid and p.compid=c.compid where p.status = 'parcelPlaced'";
+
+	try {
+		const result = await db.query(str);
+		res.status(200).send(result);
+	} catch (error) {
+		res.status(500).send({ message: "Error while getting parcel details for rider to deliver: " + error });
+	}
+
+});
+
+app.put('/sendParcel/reattempt', async (req, res) => {
+	try {
+		const { parcelId, compID, lockerID } = req.body;
+		//check whether it is reattempt or not
+		const str = "select stampid from SendParcel where parcelid = " + parcelId;
+		const reattempt = await db.query(str);
+		const stampid = reattempt.rows[0].stampid;
+
+		const getfailedQuery = `SELECT failed FROM timestamps where stampid = ;` + stampid + " and failed is null";
+		const flagfailed = await db.query(getfailedQuery);
+		if (flagfailed.rowCount !== 0) {
+			const str1 = "update timestamps set reattempt= now(), placement = null where stampid=" + stampid;
+			await db.query(str1);
+			await updateCompartment(lockerID, compID, parcelId);
+		}
+
+
+
+		res.status(201).json({ success: true });
+
+	} catch (error) {
+		console.error("Error inserting parcel with timestamp:", error);
+		res.status(500).json({ success: false, message: "Database error" });
+	}
+});
+
+async function updateCompartment(lockerID, compID, parcelID) {
+	const values1 = {
+		lockerid: lockerID,
+		compid: compID,
+		compstateid: 2
+	};
+	await axios.put('http://localhost:4002/Locker/Compartment/compstateid', values1)
+		.then(response => {
+			console.log(response.data);
+			//res.status(200).send({message: "Locker reserved"});
+		})
+		.catch(err => {
+			throw (err);
+		});
+
+	//updating parcelid of compartment in locker to Reserved
+	const values2 = {
+		lockerid: lockerID,
+		compid: compID,
+		parcelid: parcelID
+	};
+	await axios.put('http://localhost:4002/Locker/Compartment/parcelid', values2)
+		.then(response => {
+			console.log(response.data);
+			//res.status(200).send({message: "Locker reserved"});
+		})
+		.catch(err => {
+			throw (err);
+		});
+	const otp = Math.floor(Math.random() * 9000);
+	const values3 = {
+		lockerid: lockerID,
+		compid: compID,
+		otp: otp
+	}
+	await axios.put('http://localhost:4002/Locker/Compartment/otp', values3)
+		.then(response => {
+			console.log(response.data + " " + otp);
+		})
+		.catch(err => {
+			throw (err);
+		});
+
+	const values4 = {
+		lockerid: lockerID,
+		compid: compID,
+		purpose: "sending"
+	}
+	await axios.put('http://localhost:4002/Locker/Compartment/purpose', values4)
+		.then(response => {
+			console.log(response.data.message);
+		})
+		.catch(err => {
+			throw (err);
+		});
+}
+
+app.put('/updateStatusOfSending', async (req, res) => {
+	const parcelID = req.body.parcelID;
+	const status = req.body.status;
+
+	const str = "update SendParcel set status ='" + status + "' where parcelid = " + parcelID;
+
+	try {
+		const result = await db.query(str);
+		res.status(200).send({ message: "Parcel status updated successfully" });
+	} catch (error) {
+		console.log(error);
+		res.status(500).send({ message: "Error while updating status of parcel: " + error });
+	}
+});
+
+app.put("/sendParcel/updateLockerID", (req, res) => {
+	let parcelID = req.body.parcelID;
+
+	const str = "update SendParcel set lockerid = null, compid = null where parcelid = " + parcelID;
+
+	db.query(str, (err, data) => {
+		if (err) {
+			return res.json("Error");
+		}
+		return res.json("Locker ID and CompID updated");
+	});
 });
