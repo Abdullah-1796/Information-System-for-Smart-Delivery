@@ -23,8 +23,10 @@ const SendParcel = () => {
   const [provinces, setProvinces] = useState([]);
   const [cities, setCities] = useState([]);
   const [selectedLocker, setSelectedLocker] = useState("");
-  const [compID,setCompID]=useState("");
+  const [compID, setCompID] = useState("");
   const [formValid, setFormValid] = useState(false);
+  const [activeSection, setActiveSection] = useState("location"); // For multi-step form
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Add validation effect
   useEffect(() => {
@@ -34,7 +36,7 @@ const SendParcel = () => {
   }, [formData, selectedLocker]);
 
   // Add locker selection handler
-  const handleLockerSelect = (lockerId,compID) => {
+  const handleLockerSelect = (lockerId, compID) => {
     setSelectedLocker(lockerId);
     setCompID(compID);
   };
@@ -66,6 +68,8 @@ const SendParcel = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    
     const id = Date.now() + Math.floor(Math.random() * 1000);
     const countryName =
       countries.find((c) => c.isoCode === formData.country)?.name || "";
@@ -88,12 +92,13 @@ const SendParcel = () => {
     ];
   
     const missingFields = requiredFields
-      .filter((field) => !formData[field.key]?.trim()) // Check for empty values
+      .filter((field) => !formData[field.key]?.trim())
       .map((field) => field.label);
   
     if (missingFields.length > 0) {
       alert(`Please fill in the following fields:\n${missingFields.join("\n")}`);
-      return; // Stop form submission
+      setIsSubmitting(false);
+      return;
     }
   
     const requestData = {
@@ -121,7 +126,6 @@ const SendParcel = () => {
       const response = await axios.post("http://localhost:4001/sendParcel", requestData);
       if (response.data.success) {
         alert("Parcel successfully sent!");
-        // Reset all fields
         setFormData({
           parcelDescription: "",
           parcelWeight: "",
@@ -135,156 +139,323 @@ const SendParcel = () => {
           province: "",
           country: "",
         });
+        setSelectedLocker("");
+        setActiveSection("location");
       }
     } catch (error) {
       console.error("Error:", error);
       alert("Error sending parcel");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
+  const nextSection = () => {
+    if (activeSection === "location" && formData.country && formData.province && formData.city) {
+      setActiveSection("parcel");
+    } else if (activeSection === "parcel" && formData.parcelDescription && formData.parcelWeight) {
+      setActiveSection("sender");
+    } else if (activeSection === "sender" && formData.senderName && formData.senderPhone && formData.senderAddress) {
+      setActiveSection("receiver");
+    } else {
+      alert("Please complete all fields in the current section before proceeding.");
+    }
+  };
+
+  const prevSection = () => {
+    if (activeSection === "parcel") setActiveSection("location");
+    else if (activeSection === "sender") setActiveSection("parcel");
+    else if (activeSection === "receiver") setActiveSection("sender");
+  };
+
   return (
-    <div className="container">
-      <h2>Parcel Delivery Form</h2>
-      <form onSubmit={handleSubmit}>
-        {/* LOCATION DETAILS - MODIFIED */}
-        <h3>Location Details</h3>
-        <label>Country:</label>
-        <select
-          name="country"
-          value={formData.country}
-          onChange={handleChange}
-          required
-        >
-          <option value="">Select Country</option>
-          {countries.map((country) => (
-            <option key={country.isoCode} value={country.isoCode}>
-              {country.name}
-            </option>
-          ))}
-        </select>
+    <div className="main-container">
+      <div className="form-container">
+        <h2 className="form-title">Parcel Delivery</h2>
+        
+        {/* Progress indicator */}
+        <div className="progress-indicator">
+          <div className={`progress-step ${activeSection === "location" ? "active" : ""}`}>
+            <span>1</span>
+            <p>Location</p>
+          </div>
+          <div className={`progress-step ${activeSection === "parcel" ? "active" : ""}`}>
+            <span>2</span>
+            <p>Parcel</p>
+          </div>
+          <div className={`progress-step ${activeSection === "sender" ? "active" : ""}`}>
+            <span>3</span>
+            <p>Sender</p>
+          </div>
+          <div className={`progress-step ${activeSection === "receiver" ? "active" : ""}`}>
+            <span>4</span>
+            <p>Receiver</p>
+          </div>
+        </div>
 
-        <label>Province:</label>
-        <select
-          name="province"
-          value={formData.province}
-          onChange={handleChange}
-          required
-          disabled={!formData.country}
-        >
-          <option value="">Select Province</option>
-          {provinces.map((province) => (
-            <option key={province.isoCode} value={province.isoCode}>
-              {province.name}
-            </option>
-          ))}
-        </select>
+        <form onSubmit={handleSubmit}>
+          {/* LOCATION DETAILS */}
+          <div className={`form-section ${activeSection === "location" ? "active" : ""}`}>
+            <h3>Location Details</h3>
+            <div className="form-group">
+              <label>Country:</label>
+              <select
+                name="country"
+                value={formData.country}
+                onChange={handleChange}
+                required
+                className="form-select"
+              >
+                <option value="">Select Country</option>
+                {countries.map((country) => (
+                  <option key={country.isoCode} value={country.isoCode}>
+                    {country.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        <label>City:</label>
-        <select
-          name="city"
-          value={formData.city}
-          onChange={handleChange}
-          required
-          disabled={!formData.province}
-        >
-          <option value="">Select City</option>
-          {cities.map((city) => (
-            <option key={city.name} value={city.name}>
-              {city.name}
-            </option>
-          ))}
-        </select>
-        {/* PARCEL DETAILS - PRESERVED */}
-        <h3>Parcel Details</h3>
-        <label>Description:</label>
-        <input
-          type="text"
-          name="parcelDescription"
-          value={formData.parcelDescription}
-          onChange={handleChange}
-          required
-        />
+            <div className="form-group">
+              <label>Province/State:</label>
+              <select
+                name="province"
+                value={formData.province}
+                onChange={handleChange}
+                required
+                disabled={!formData.country}
+                className="form-select"
+              >
+                <option value="">Select Province</option>
+                {provinces.map((province) => (
+                  <option key={province.isoCode} value={province.isoCode}>
+                    {province.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        <label>Parcel Size:</label>
-        <select
-          name="parcelWeight"
-          value={formData.parcelWeight}
-          onChange={handleChange}
-          required
-        >
-          <option value="">Select Size</option>
-          <option value="small">Small (1 to 3kg)</option>
-          <option value="medium">Medium (3.1 to 5kg)</option>
-          <option value="large">Large (5.1 to 10kg)</option>
-        </select>
+            <div className="form-group">
+              <label>City:</label>
+              <select
+                name="city"
+                value={formData.city}
+                onChange={handleChange}
+                required
+                disabled={!formData.province}
+                className="form-select"
+              >
+                <option value="">Select City</option>
+                {cities.map((city) => (
+                  <option key={city.name} value={city.name}>
+                    {city.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="form-navigation">
+              <button type="button" className="next-btn" onClick={nextSection}>
+                Next: Parcel Details
+              </button>
+            </div>
+          </div>
 
-        {/* SENDER DETAILS - PRESERVED */}
-        <h3>Sender Details</h3>
-        <label>Name:</label>
-        <input
-          type="text"
-          name="senderName"
-          value={formData.senderName}
-          onChange={handleChange}
-          required
-        />
+          {/* PARCEL DETAILS */}
+          <div className={`form-section ${activeSection === "parcel" ? "active" : ""}`}>
+            <h3>Parcel Details</h3>
+            <div className="form-group">
+              <label>Description:</label>
+              <input
+                type="text"
+                name="parcelDescription"
+                value={formData.parcelDescription}
+                onChange={handleChange}
+                required
+                className="form-input"
+                placeholder="What's in the package?"
+              />
+            </div>
 
-        <label>Phone:</label>
-        <input
-          type="text"
-          name="senderPhone"
-          value={formData.senderPhone}
-          onChange={handleChange}
-          required
-        />
+            <div className="form-group">
+              <label>Parcel Size:</label>
+              <div className="size-options">
+                <label className="size-option">
+                  <input
+                    type="radio"
+                    name="parcelWeight"
+                    value="small"
+                    checked={formData.parcelWeight === "small"}
+                    onChange={handleChange}
+                    required
+                  />
+                  <div className="size-card">
+                    <h4>Small</h4>
+                    <p>1-3kg</p>
+                    <p>Books, documents</p>
+                  </div>
+                </label>
+                
+                <label className="size-option">
+                  <input
+                    type="radio"
+                    name="parcelWeight"
+                    value="medium"
+                    checked={formData.parcelWeight === "medium"}
+                    onChange={handleChange}
+                  />
+                  <div className="size-card">
+                    <h4>Medium</h4>
+                    <p>3.1-5kg</p>
+                    <p>Shoes, small electronics</p>
+                  </div>
+                </label>
+                
+                <label className="size-option">
+                  <input
+                    type="radio"
+                    name="parcelWeight"
+                    value="large"
+                    checked={formData.parcelWeight === "large"}
+                    onChange={handleChange}
+                  />
+                  <div className="size-card">
+                    <h4>Large</h4>
+                    <p>5.1-10kg</p>
+                    <p>Clothing, kitchenware</p>
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <div className="form-navigation">
+              <button type="button" className="prev-btn" onClick={prevSection}>
+                Back
+              </button>
+              <button type="button" className="next-btn" onClick={nextSection}>
+                Next: Sender Details
+              </button>
+            </div>
+          </div>
 
-        <label>Address:</label>
-        <textarea
-          name="senderAddress"
-          value={formData.senderAddress}
-          onChange={handleChange}
-          required
-        ></textarea>
+          {/* SENDER DETAILS */}
+          <div className={`form-section ${activeSection === "sender" ? "active" : ""}`}>
+            <h3>Sender Details</h3>
+            <div className="form-group">
+              <label>Full Name:</label>
+              <input
+                type="text"
+                name="senderName"
+                value={formData.senderName}
+                onChange={handleChange}
+                required
+                className="form-input"
+                placeholder="Your full name"
+              />
+            </div>
 
-        {/* RECEIVER DETAILS - PRESERVED */}
-        <h3>Receiver Details</h3>
-        <label>Name:</label>
-        <input
-          type="text"
-          name="receiverName"
-          value={formData.receiverName}
-          onChange={handleChange}
-          required
-        />
+            <div className="form-group">
+              <label>Phone Number:</label>
+              <input
+                type="tel"
+                name="senderPhone"
+                value={formData.senderPhone}
+                onChange={handleChange}
+                required
+                className="form-input"
+                placeholder="+1 (123) 456-7890"
+              />
+            </div>
 
-        <label>Phone:</label>
-        <input
-          type="text"
-          name="receiverPhone"
-          value={formData.receiverPhone}
-          onChange={handleChange}
-          required
-        />
+            <div className="form-group">
+              <label>Address:</label>
+              <textarea
+                name="senderAddress"
+                value={formData.senderAddress}
+                onChange={handleChange}
+                required
+                className="form-textarea"
+                placeholder="Your complete address"
+                rows="3"
+              ></textarea>
+            </div>
+            
+            <div className="form-navigation">
+              <button type="button" className="prev-btn" onClick={prevSection}>
+                Back
+              </button>
+              <button type="button" className="next-btn" onClick={nextSection}>
+                Next: Receiver Details
+              </button>
+            </div>
+          </div>
 
-        <label>Address:</label>
-        <textarea
-          name="receiverAddress"
-          value={formData.receiverAddress}
-          onChange={handleChange}
-          required
-        ></textarea>
-        <AvailableLockers
-          city={formData.city}
-          parcelDetails={{
-            trackingID: formData.riderTrackingID, // or your generated tracking ID
-            parcelWeight: formData.parcelWeight,
-          }}
-          onLockerSelect={handleLockerSelect}
-        />
-        <button type="submit" disabled={!formValid || !selectedLocker}>
-          Submit
-        </button>
-      </form>
+          {/* RECEIVER DETAILS */}
+          <div className={`form-section ${activeSection === "receiver" ? "active" : ""}`}>
+            <h3>Receiver Details</h3>
+            <div className="form-group">
+              <label>Full Name:</label>
+              <input
+                type="text"
+                name="receiverName"
+                value={formData.receiverName}
+                onChange={handleChange}
+                required
+                className="form-input"
+                placeholder="Receiver's full name"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Phone Number:</label>
+              <input
+                type="tel"
+                name="receiverPhone"
+                value={formData.receiverPhone}
+                onChange={handleChange}
+                required
+                className="form-input"
+                placeholder="+1 (123) 456-7890"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Address:</label>
+              <textarea
+                name="receiverAddress"
+                value={formData.receiverAddress}
+                onChange={handleChange}
+                required
+                className="form-textarea"
+                placeholder="Receiver's complete address"
+                rows="3"
+              ></textarea>
+            </div>
+
+            <AvailableLockers
+              city={formData.city}
+              parcelDetails={{
+                trackingID: formData.riderTrackingID,
+                parcelWeight: formData.parcelWeight,
+              }}
+              onLockerSelect={handleLockerSelect}
+              selectedLocker={selectedLocker}
+            />
+            
+            <div className="form-navigation">
+              <button type="button" className="prev-btn" onClick={prevSection}>
+                Back
+              </button>
+              <button 
+                type="submit" 
+                className="submit-btn"
+                disabled={!formValid || !selectedLocker || isSubmitting}
+              >
+                {isSubmitting ? "Sending..." : "Send Parcel"}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
