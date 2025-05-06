@@ -1366,7 +1366,7 @@ app.get("/getDeliveredParcels", async (req, res) => {
 
 app.get("/", async (req, res) => {
 	try {
-		const result = await db.query("SELECT * FROM timestamps");
+		const result = await db.query("SELECT * FROM parcelfordelivery");
 		res.status(200).json(result.rows);
 	} catch (err) {
 		console.error("Database query error:", err);
@@ -1497,4 +1497,65 @@ app.put("/sendParcel/updateLockerID", (req, res) => {
 		}
 		return res.json("Locker ID and CompID updated");
 	});
+});
+
+app.put('/markFailpickups', async (req, res) => {
+	const days = req.body.days;
+	let failedDeliveries = 0;
+
+	console.log("Number of days: " + days);
+
+	const str = "select parcelid, stampid, lockerid, compid, to_char(creationtime, 'yyyy-mm-dd') as date from SendParcel where status ='selectionDone'";
+
+	try {
+		const result = await db.query(str);
+		//console.log(result);
+		if (result.rowCount > 0) {
+			for (let i = 0; i < result.rowCount; i++) {
+
+				const date1 = new Date(result.rows[i].date);
+				const date2 = new Date(Date.now());
+
+				const daysWaited = (date2.getTime() - date1.getTime()) / (24 * 60 * 60 * 1000);
+				console.log("Days delayed: " + daysWaited);
+				if (daysWaited >= days) {
+					const str1 = "update SendParcel set status = 'failed' where parcelid = " + result.rows[i].parcelid;
+
+					const result1 = await db.query(str1);
+
+					const values = {
+						column: "failed",
+						stampid: result.rows[i].stampid
+					}
+					await axios.put('http://localhost:4001/updateTimestamp', values)
+						.then(response => {
+							console.log(response.data.message);
+						})
+						.catch(err => {
+							console.error("Error while updating status of parcel: " + err);
+						});
+
+					const otp = Math.floor(Math.random() * 9000);
+					const values1 = {
+						lockerid: result.rows[i].lockerid,
+						compid: result.rows[i].compid,
+						otp: otp
+					}
+					axios.put('http://localhost:4002/Locker/Compartment/otp', values1)
+						.then(response => {
+							console.log(response.data.message);
+						})
+						.catch(err => {
+							console.error(err);
+						});
+
+					failedDeliveries++;
+				}
+
+			}
+		}
+		res.status(200).send({ message: "Number of deliveries masked as failed: " + failedDeliveries });
+	} catch (error) {
+		res.status(500).send({ message: "Error while marking failed deliveries: " + error });
+	}
 });

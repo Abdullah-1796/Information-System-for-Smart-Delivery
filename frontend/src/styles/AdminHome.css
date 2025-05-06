@@ -7,7 +7,7 @@ body {
 }
 
 #adminHome-container > h1 {
-	font-family: 'Pacifico', cursive;
+	font-family: 'Aptos', cursive;
 	font-size: 300%;
 	margin: 0 0 0 2%;
 }
@@ -47,7 +47,7 @@ body {
 }
 
 #message > h3 {
-	font-family: 'Pacifico', cursive;
+	font-family: 'apptos', cursive;
 	font-size: 250%;
 	margin: 0;
 }
