@@ -1,5 +1,5 @@
 #userHome-container h1 {
-    font-family: "Pacifico", cursive;
+    font-family: "", cursive;
     font-size: 300%;
     margin: 0 0 0 2%;
 }
@@ -46,14 +46,14 @@
 .detail {
     font-size: 135%;
     margin: 2%;
-    font-family: "Public Sans", sans-serif;
+    font-family: "", sans-serif;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
 #userHome-container .heading {
-    font-family: "Pacifico", cursive;
+    font-family: "", cursive;
     font-size: 220%;
     margin: 0;
     font-weight: bold;
