@@ -12,7 +12,7 @@ async function updateCompartment(lockerID, compID, parcelID) {
 	};
 	await axios.put('http://localhost:4002/Locker/Compartment/compstateid', values1)
 		.then(response => {
-			console.log(response.data);
+			// console.log(response.data);
 			//res.status(200).send({message: "Locker reserved"});
 		})
 		.catch(err => {
@@ -27,7 +27,7 @@ async function updateCompartment(lockerID, compID, parcelID) {
 	};
 	await axios.put('http://localhost:4002/Locker/Compartment/parcelid', values2)
 		.then(response => {
-			console.log(response.data);
+			// console.log(response.data);
 			//res.status(200).send({message: "Locker reserved"});
 		})
 		.catch(err => {
@@ -41,7 +41,7 @@ async function updateCompartment(lockerID, compID, parcelID) {
 	}
 	await axios.put('http://localhost:4002/Locker/Compartment/otp', values3)
 		.then(response => {
-			console.log(response.data + " " + otp);
+			// console.log(response.data + " " + otp);
 		})
 		.catch(err => {
 			throw (err);
@@ -54,7 +54,7 @@ async function updateCompartment(lockerID, compID, parcelID) {
 	}
 	await axios.put('http://localhost:4002/Locker/Compartment/purpose', values4)
 		.then(response => {
-			console.log(response.data.message);
+			// console.log(response.data.message);
 		})
 		.catch(err => {
 			throw (err);
@@ -62,6 +62,7 @@ async function updateCompartment(lockerID, compID, parcelID) {
 }
 
 router.post("/", async (req, res) => {
+
 	try {
 		const {
 			itemName,
@@ -75,13 +76,13 @@ router.post("/", async (req, res) => {
 			city,
 			province,
 			dimensionID,
-			receiverTrackingID,
+			sendertrackingid,
 			riderTrackingID,
 			lockerID,
 			compID,
 			status
 		} = req.body;
-
+		// console.log("riderTrackingID ", riderTrackingID);
 		// Step 1: Insert timestamp and get stampid
 		const insertTimestampQuery = `INSERT INTO timestamps (selection) VALUES (NOW());`;
 		await db.query(insertTimestampQuery);
@@ -96,7 +97,7 @@ router.post("/", async (req, res) => {
 		const parcelQuery = `
 		INSERT INTO SendParcel (
 		  itemName, sname, sphone, semail, rname, rphone, remail, address, city, 
-		  province, dimensionID, receiverTrackingID, riderTrackingID, lockerID, compID, status, stampid
+		  province, dimensionID, sendertrackingid, riderTrackingID, lockerID, compID, status, stampid
 		) VALUES (
 		  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17
 		) RETURNING *;
@@ -114,7 +115,7 @@ router.post("/", async (req, res) => {
 			city,
 			province,
 			dimensionID,
-			receiverTrackingID,
+			sendertrackingid,
 			riderTrackingID,
 			lockerID,
 			compID,
@@ -137,6 +138,7 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
+	console.log(res.query);
 	try {
 		const { city, compcategoryid } = req.query; // Get both query parameters
 		if (!city || !compcategoryid) {

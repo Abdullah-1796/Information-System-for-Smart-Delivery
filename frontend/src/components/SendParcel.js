@@ -69,13 +69,13 @@ const SendParcel = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     const id = Date.now() + Math.floor(Math.random() * 1000);
     const countryName =
       countries.find((c) => c.isoCode === formData.country)?.name || "";
     const provinceName =
       provinces.find((p) => p.isoCode === formData.province)?.name || "";
-  
+
     // Validate required fields
     const requiredFields = [
       { key: "parcelDescription", label: "Parcel Description" },
@@ -90,17 +90,17 @@ const SendParcel = () => {
       { key: "province", label: "Province" },
       { key: "country", label: "Country" },
     ];
-  
+
     const missingFields = requiredFields
       .filter((field) => !formData[field.key]?.trim())
       .map((field) => field.label);
-  
+
     if (missingFields.length > 0) {
       alert(`Please fill in the following fields:\n${missingFields.join("\n")}`);
       setIsSubmitting(false);
       return;
     }
-  
+
     const requestData = {
       lockerid: selectedLocker,
       itemName: formData.parcelDescription,
@@ -114,14 +114,14 @@ const SendParcel = () => {
       city: formData.city,
       province: provinceName,
       country: countryName,
-      dimensionID: formData.parcelWeight === "small" ? 1 : formData.parcelWeight === "medium" ? 2 : "large"?3:null,
-      receiverTrackingID: null,
+      dimensionID: formData.parcelWeight === "small" ? 1 : formData.parcelWeight === "medium" ? 2 : "large" ? 3 : null,
+      sendertrackingid: id + 3,
       riderTrackingID: id + 2,
       lockerID: selectedLocker,
       compID: compID,
       status: "selectionDone",
     };
-  
+
     try {
       const response = await axios.post("http://localhost:4001/sendParcel", requestData);
       if (response.data.success) {
@@ -172,7 +172,7 @@ const SendParcel = () => {
     <div className="main-container">
       <div className="form-container">
         <h2 className="form-title">Parcel Delivery</h2>
-        
+
         {/* Progress indicator */}
         <div className="progress-indicator">
           <div className={`progress-step ${activeSection === "location" ? "active" : ""}`}>
@@ -252,7 +252,7 @@ const SendParcel = () => {
                 ))}
               </select>
             </div>
-            
+
             <div className="form-navigation">
               <button type="button" className="next-btn" onClick={nextSection}>
                 Next: Parcel Details
@@ -294,7 +294,7 @@ const SendParcel = () => {
                     <p>Books, documents</p>
                   </div>
                 </label>
-                
+
                 <label className="size-option">
                   <input
                     type="radio"
@@ -309,7 +309,7 @@ const SendParcel = () => {
                     <p>Shoes, small electronics</p>
                   </div>
                 </label>
-                
+
                 <label className="size-option">
                   <input
                     type="radio"
@@ -326,7 +326,7 @@ const SendParcel = () => {
                 </label>
               </div>
             </div>
-            
+
             <div className="form-navigation">
               <button type="button" className="prev-btn" onClick={prevSection}>
                 Back
@@ -378,7 +378,7 @@ const SendParcel = () => {
                 rows="3"
               ></textarea>
             </div>
-            
+
             <div className="form-navigation">
               <button type="button" className="prev-btn" onClick={prevSection}>
                 Back
@@ -440,13 +440,13 @@ const SendParcel = () => {
               onLockerSelect={handleLockerSelect}
               selectedLocker={selectedLocker}
             />
-            
+
             <div className="form-navigation">
               <button type="button" className="prev-btn" onClick={prevSection}>
                 Back
               </button>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="submit-btn"
                 disabled={!formValid || !selectedLocker || isSubmitting}
               >

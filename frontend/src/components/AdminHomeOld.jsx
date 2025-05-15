@@ -64,13 +64,13 @@ const AdminHomeOld = () => {
     axios
       .post("http://localhost:4001/postUpdates", selectedData)
       .then((res) => {
-        console.log(res.data.message);
+        // console.log(res.data.message);
         if (res.status === 200) {
           alert(res.data.message);
         }
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
       });
 
     setShowPopup(false);
@@ -82,7 +82,7 @@ const AdminHomeOld = () => {
     axios
       .get("http://localhost:4001/getUpdates")
       .then((res) => {
-        console.log(res.data);
+        // console.log(res.data);
 
         if (res.status === 200) {
           const fetchedData = res.data.rows || []; // Extract 'rows' from response
@@ -116,7 +116,7 @@ const AdminHomeOld = () => {
         }
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
         alert("Error fetching updates!");
       });
   }
@@ -137,13 +137,13 @@ const AdminHomeOld = () => {
       axios
         .put("http://localhost:4001/markFailDeliveries", values)
         .then((res) => {
-          console.log(res.data);
+          // console.log(res.data);
           if (res.status === 200) {
             alert(res.data.message);
           }
         })
         .catch((err) => {
-          console.log(err);
+          // console.log(err);
         });
     }
   }
@@ -160,7 +160,7 @@ const AdminHomeOld = () => {
       if (response.data.success) {
         setParcels(response.data.data); // Update state with fetched data
         setShowtable(true); // Show the table
-        console.log("Data is:", response.data.data);
+        // console.log("Data is:", response.data.data);
       } else {
         throw new Error(response.data.message || "Failed to fetch data");
       }
@@ -183,7 +183,7 @@ const AdminHomeOld = () => {
       if (response.data.success) {
         setParcels(response.data.data); // Update state with fetched data
         setShowtable(true); // Show the table
-        // console.log("Data is:", response.data.data);
+        // // console.log("Data is:", response.data.data);
       } else {
         throw new Error(response.data.message || "Failed to fetch data");
       }
@@ -206,7 +206,7 @@ const AdminHomeOld = () => {
       if (response.data.success) {
         setParcels(response.data.data); // Update state with fetched data
         setShowtable(true); // Show the table
-        // console.log("Data is:", response.data.data);
+        // // console.log("Data is:", response.data.data);
       } else {
         throw new Error(response.data.message || "Failed to fetch data");
       }

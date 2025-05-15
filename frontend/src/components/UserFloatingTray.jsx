@@ -58,14 +58,14 @@ function UserFloatingTray() {
                     <Option
                         backgroundColor="#123458"
                         color="white"
-                        label="Select Locker"
-                        link="/SelectLocker"
+                        label="Send Parcel "
+                        link="/SendParcel"
                     />
                     <Option
                         backgroundColor="#EDE8DC"
                         color="black"
-                        label="Select Locker"
-                        link="/SelectLocker"
+                         label="Re-schedule Pickup"
+                        link="/ReSchedulePickup"
                     />
                 </div>
             </div>

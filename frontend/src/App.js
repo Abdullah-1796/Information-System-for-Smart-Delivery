@@ -11,6 +11,7 @@ import ParcelReceivingDetail from './components/ParcelReceivingDetail';
 import FailedParcelDetail from './components/FailedParcelDetail';
 import ReceiverHome from './components/ReceiverHome';
 import ReScheduleDelivery from './components/ReScheduleDelivery';
+import ReSchedulePickup from './components/ReSchedulePickup';
 import SendParcel from './components/SendParcel';
 import UserHome from './components/UserHome';
 import AdminHomeOld from './components/AdminHomeOld';
@@ -28,6 +29,7 @@ function App() {
 				<Route exact path="/ReceiverHome" element={<ReceiverHome />} />
 				<Route exact path="/SelectLocker" element={<SelectLocker />} />
 				<Route exact path="/ReScheduleDelivery" element={<ReScheduleDelivery />} />
+				<Route exact path="/ReSchedulePickup" element={<ReSchedulePickup />} />
 				<Route exact path="/RiderHome" element={<RiderHome />} />
 				<Route exact path="/ParcelDeliveryDetail" element={<ParcelDeliveryDetail />} />
 				<Route exact path="/ParcelReceivingDetail" element={<ParcelReceivingDetail />} />

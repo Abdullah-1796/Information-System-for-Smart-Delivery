@@ -9,28 +9,28 @@ function InteractionScreen(props) {
     const [noOfCompartments, setNoOfCompartments] = useState("");
     const handleTypeChange = (event) => {
         setSelectedType(event.target.id);
-        console.log(`Selected type: ${event.target.id}`);
+        // console.log(`Selected type: ${event.target.id}`);
     };
 
     const handleAmountChange = (event) => {
         const value = Math.abs(event.target.value); // Ensure the value is positive
         setNoOfCompartments(value);
-        console.log(`Number of compartments: ${value}`);
+        // console.log(`Number of compartments: ${value}`);
     };
     let clickedOutside = true;
     const id = props.id;
-    // React.useEffect(()=>{console.log(id)},[id])
+    // React.useEffect(()=>{// console.log(id)},[id])
 
     function handleClick() {
-        console.log(id)
+        // console.log(id)
         axios.post('http://localhost:4001/compartment', { selectedType, id, noOfCompartments})
             .then(res => {
-                console.log(res.data.message);
+                // console.log(res.data.message);
                 props.hideScreen();
                 props.loadData()
             })
             .catch(err => {
-                console.log(err);
+                // console.log(err);
             });
     }
     return (

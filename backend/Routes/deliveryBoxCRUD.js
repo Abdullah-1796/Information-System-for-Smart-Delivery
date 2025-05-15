@@ -3,7 +3,7 @@ import db from "../database.js";
 const router = express.Router();
 
 async function addcompartment(lockerid, noofSmall, noofMedium, noofLarge) {
-    console.log(lockerid)
+    // console.log(lockerid)
     // Define the base query for inserting a new compartment
     const query = `
         INSERT INTO compartment ("lockerid", "compstateid", "compcategoryid", "islocked", "otp")
@@ -42,7 +42,7 @@ router.post("/", async (req, res) => {
 		const existingRecord = await db.query(checkQuery, [data.address, data.city]);
 
 		if (existingRecord.rows.length > 0) {
-			console.log(existingRecord.rows);
+			// console.log(existingRecord.rows);
 
 			return res.status(400).json({ error: "A locker with this address and city already exists." });
 		}

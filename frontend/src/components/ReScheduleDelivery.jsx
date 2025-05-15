@@ -12,7 +12,7 @@ function ReScheduleDelivery() {
     }
 
     function reserveLocker(lockerID, compCategoryID, parcelID) {
-        console.log(lockerID);
+        // console.log(lockerID);
         const value = {
             lockerID: lockerID,
             compCategoryID: compCategoryID,
@@ -21,7 +21,7 @@ function ReScheduleDelivery() {
         }
         axios.post('http://localhost:4001/reserveLocker', value)
             .then(res => {
-                //console.log(res.data);
+                //// console.log(res.data);
                 if (res.status == 200) {
                     alert("Locker Successfully Reserved");
                     setData([]);
@@ -38,6 +38,7 @@ function ReScheduleDelivery() {
 
     function findLockers() {
         const value = {
+            column:"parcelfordelivery",
             trackingID: trackingID,
         }
 
@@ -47,9 +48,9 @@ function ReScheduleDelivery() {
 
                     axios.get('http://localhost:4001/checkParcelInLocker', { params: value })
                         .then(response => {
-                            console.log(response);
+                            // console.log(response);
                             if (response.status == 200 && response.data.rowCount > 0) {
-                                //console.log(res.data.stampid, res.data.lockerid, res.data.compid)
+                                //// console.log(res.data.stampid, res.data.lockerid, res.data.compid)
                                 const value1 = {
                                     stampid: res.data.stampid,
                                     column: "reattempt"
@@ -72,7 +73,7 @@ function ReScheduleDelivery() {
                                                     axios.put('http://localhost:4001/updateStatus', value3)
                                                         .then(response3 => {
                                                             alert("Parcel is already in locker at " + response.data.rows[0].address + " with otp: " + otp);
-                                                            console.log(response.data.rows);
+                                                            // console.log(response.data.rows);
                                                         })
                                                         .catch(error3 => {
                                                             console.error(error3);
@@ -108,7 +109,7 @@ function ReScheduleDelivery() {
                 }
             })
             .catch(err => {
-                console.log("Error while checking for eligibility: " + err);
+                // console.log("Error while checking for eligibility: " + err);
             });
     }
 

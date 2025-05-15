@@ -1,5 +1,5 @@
 import express, { response } from "express";
-import db from "./database.js" 
+import db from "./database.js"
 import cors from "cors";
 import bodyParser from "body-parser";
 import fs from 'fs';
@@ -8,7 +8,7 @@ import twilio from "twilio";
 import axios from "axios";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc"
-import postandgetUpdate from "./Routes/post&getUpdates.js" 
+import postandgetUpdate from "./Routes/post&getUpdates.js"
 import parceldetails from "./Routes/getparcelToDeliverDetails.js"
 import LockerCRUD from "./Routes/lockerCRUD.js"
 import updateStatus from "./Routes/updateStatus.js"
@@ -24,6 +24,9 @@ import getPending from "./Routes/getParcels/getPending.js";
 import getDelivered from "./Routes/getParcels/getDelivered.js";
 import getPlaced from "./Routes/getParcels/getPlaced.js";
 import parcelToReceive from "./Routes/getDetailsOfReceivingParcel.js"
+import checkforRePickup from "./Routes/checkingEligibilityForRePickup.js"
+import checkParcelSender from "./Routes/checkParcelinLockerforSender.js";
+import updateStatusSender from "./Routes/updateLockerIdforSender.js"
 
 
 const port = 4001;
@@ -155,7 +158,7 @@ app.use('/postUpdates', postandgetUpdate);
  *       500:
  *         description: Error while fetching data
  */
-app.use('/getUpdates',postandgetUpdate);
+app.use('/getUpdates', postandgetUpdate);
 
 /**
  * @swagger
@@ -588,7 +591,7 @@ app.use("/checkParcelInLocker", checkParcel)
 
 app.use("/L", deliveryBox);
 
-app.use("/L",deliveryBox);
+app.use("/L", deliveryBox);
 
 app.use("/L", deliveryBox);
 
@@ -668,13 +671,47 @@ app.use("/getDeliveredParcels", getDelivered);
 
 app.get("/", async (req, res) => {
 	try {
-		const result = await db.query("SELECT * FROM Timestamps");
+		const result = await db.query("SELECT * FROM sendParcel");
 		res.status(200).json(result.rows);
 	} catch (err) {
 		console.error("Database query error:", err);
 		res.status(500).json({ error: "Internal server error" });
 	}
 });
+
+app.get("/delivery", async (req, res) => {
+	try {
+		const result = await db.query("SELECT * FROM parcelForDelivery");
+		res.status(200).json(result.rows);
+	} catch (err) {
+		console.error("Database query error:", err);
+		res.status(500).json({ error: "Internal server error" });
+	}
+});
+
+app.get("/time", async (req, res) => {
+	try {
+		const result = await db.query("SELECT * FROM timestamps");
+		res.status(200).json(result.rows);
+	} catch (err) {
+		console.error("Database query error:", err);
+		res.status(500).json({ error: "Internal server error" });
+	}
+});
+
+app.get("/random", async (req, res) => {
+	let column = "SendParcel";
+	try {
+		const result = await db.query(`
+			select c.compcategoryid from compartment c where c.compid=43
+		`);
+		res.status(200).json(result.rows);
+	} catch (err) {
+		console.error("Database query error:", err);
+		res.status(500).json({ error: "Internal server error" });
+	}
+});
+
 
 app.use('/parcelToReceive/Details', parcelToReceive);
 
@@ -764,8 +801,14 @@ app.put('/markFailpickups', async (req, res) => {
 
 			}
 		}
-		res.status(200).send({ message: "Number of deliveries masked as failed: " + failedDeliveries });
+		res.status(200).send({ message: "Number of pickups masked as failed: " + failedDeliveries });
 	} catch (error) {
-		res.status(500).send({ message: "Error while marking failed deliveries: " + error });
+		res.status(500).send({ message: "Error while marking failed pickups: " + error });
 	}
 });
+
+app.use('/checkEligibility/RePickup', checkforRePickup);
+
+app.use("/checkParcelInLockerSender", checkParcelSender)
+
+app.use('/updateLockerId', updateStatusSender);

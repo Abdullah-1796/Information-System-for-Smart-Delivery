@@ -12,7 +12,7 @@ router.put('/', async (req, res) => {
 		const result = await db.query(str);
 		res.status(200).send({ message: "Parcel status updated successfully" });
 	} catch (error) {
-		console.log(error);
+		// console.log(error);
 		res.status(500).send({ message: "Error while updating status of parcel: " + error });
 	}
 });

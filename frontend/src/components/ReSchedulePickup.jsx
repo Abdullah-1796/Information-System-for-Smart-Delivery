@@ -1,26 +1,26 @@
 import React from "react";
 import axios from "axios";
-import "../styles/SelectLocker.css";
 import UserFloatingTray from "./UserFloatingTray";
 import CustomerCareButton from "./CustomerCareButton";
 
-function SelectLocker() {
+function ReScheduleDelivery() {
     const [trackingID, setTrackingID] = React.useState("");
+    const [stampid, setStampid] = React.useState("");
     const [data, setData] = React.useState([]);
 
     function handleTrackingID(event) {
         setTrackingID(event.target.value);
     }
 
-    function reserveLocker(lockerID, compCategoryID, parcelID) {
+    function reserveLocker(lockerid, compid) {
         // console.log(lockerID);
         const value = {
-            lockerID: lockerID,
-            compCategoryID: compCategoryID,
-            trackingID: trackingID,
-            parcelID: parcelID
+            lockerid: lockerid,
+            compid: compid,
+            stampid: stampid,
         }
-        axios.post('http://localhost:4001/reserveLocker', value)
+        console.log(value);
+        axios.put('http://localhost:4001/updateLockerId', value)
             .then(res => {
                 //// console.log(res.data);
                 if (res.status == 200) {
@@ -39,24 +39,28 @@ function SelectLocker() {
 
     function findLockers() {
         const value = {
-            column:"parcelfordelivery",
+            column: "SendParcel",
             trackingID: trackingID,
         }
-        axios.get('http://localhost:4001/checkEligibility/Delivery', { params: value })
+
+        axios.get('http://localhost:4001/checkEligibility/RePickup', { params: value })
             .then(res => {
                 if (res.status == 200 && res.data.eligible) {
-
-                    axios.get('http://localhost:4001/availableLockers', { params: value })
+                    alert("finding lockers city");
+                    // console.log("res.data", res.data);
+                    setStampid(res.data.stampid);
+                    axios.get(`http://localhost:4001/getlockers?city=${res.data.city}&compcategoryid=${res.data.compcategoryid}`)
                         .then(res => {
-                            // console.log(res.data.rows);
-                            setData(res.data.rows);
+                            console.log(res.data.data);
+                            setData(res.data.data);
                         })
                         .catch(err => {
                             console.error("Error while fetching available lockers: " + err);
                         });
+
                 }
                 else {
-                    alert("Not eligible to make scheduling event!");
+                    alert("Not eligible to make rescheduling event!");
                 }
             })
             .catch(err => {
@@ -75,16 +79,16 @@ function SelectLocker() {
             <h1>Smart Delivery</h1>
             <div id="select-locker">
                 <div id="trackingID-input">
-                    <input type="text" placeholder="Enter Receiver Tracking ID" name="id" value={trackingID} onChange={handleTrackingID} />
+                    <input type="text" placeholder="Enter Sender Tracking ID" name="id" value={trackingID} onChange={handleTrackingID} />
                     <div id="button" onClick={findLockers}>Find Lockers</div>
                 </div>
-                <h1>Select Locker for delivery</h1>
+                <h1>Select Locker to re-schedule Pickup</h1>
                 <div id="locker-list">
                     {
                         data.map((d, i) => (
                             <div id="locker-option">
                                 <img src="./images/maps.jpg" onClick={() => { openMaps(d.address) }} />
-                                <div id="detail" onClick={() => { reserveLocker(d.lockerid, d.compcategoryid, d.parcelid) }}>
+                                <div id="detail" onClick={() => { reserveLocker(d.lockerid, d.compid) }}>
 
                                     <h2>{d.address + " " + (i + 1)} </h2>
                                     <h3>{d.city}</h3>
@@ -99,4 +103,4 @@ function SelectLocker() {
     );
 }
 
-export default SelectLocker;
+export default ReScheduleDelivery;

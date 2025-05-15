@@ -3,7 +3,7 @@ import db from "../database.js";
 const router = express.Router();
 
 async function addcompartment(lockerid, noofSmall, noofMedium, noofLarge) {
-    console.log(lockerid)
+    // console.log(lockerid)
     // Define the base query for inserting a new compartment
     const query = `
         INSERT INTO compartment ("lockerid", "compstateid", "compcategoryid", "islocked", "otp")
@@ -34,14 +34,14 @@ async function addcompartment(lockerid, noofSmall, noofMedium, noofLarge) {
 }
 
 router.post("/", async (req, res) => {
-    console.log("post")
+    // console.log("post")
     const { selectedType, id, noOfCompartments } = req.body;
 
     if (!selectedType || !id || !noOfCompartments || isNaN(id) || isNaN(noOfCompartments)) {
         return res.status(400).json({ error: "Invalid request parameters" });
     }
 
-    console.log(selectedType);
+    // console.log(selectedType);
 
     switch (selectedType) {
         case "small":

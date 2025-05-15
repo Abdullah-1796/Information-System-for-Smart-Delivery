@@ -15,12 +15,12 @@ function AvailableLockers({ city, parcelDetails, onLockerSelect }) {
         alert("Select City and Weight of the parcel to get the available delivery boxes.")
         return;
       } // Prevent unnecessary API calls
-      console.log("detail is ", compcategoryid, " ", city);
+      // console.log("detail is ", compcategoryid, " ", city);
 
       setLoading("loading");
       try {
         const response = await axios.get(`http://localhost:4001/getlockers?city=${city}&compcategoryid=${compcategoryid}`);
-        console.log("API Response:", response.data); // Debugging
+        // console.log("API Response:", response.data); // Debugging
         if (!Array.isArray(response.data.data)) {
           throw new Error("Invalid response format");
         }
@@ -38,7 +38,7 @@ function AvailableLockers({ city, parcelDetails, onLockerSelect }) {
     };
 
     if (compcategoryid !== "") {
-      console.log("weight is ", compcategoryid);
+      // console.log("weight is ", compcategoryid);
       fetchAvailableLockers();
     }
   }, [compcategoryid]);
@@ -59,10 +59,10 @@ function AvailableLockers({ city, parcelDetails, onLockerSelect }) {
     onLockerSelect(lockerId, compId); // Notify parent component
     setLockers([]);
     setLoading("selected");
-    console.log("lockers are ", lockers);
+    // console.log("lockers are ", lockers);
   };
   useEffect(() => {
-    console.log("Updated lockers state:", lockers);
+    // console.log("Updated lockers state:", lockers);
   }, [lockers, loading]); // Runs when lockers state changes
 
   return (

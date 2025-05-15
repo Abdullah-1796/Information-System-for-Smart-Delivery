@@ -4,6 +4,7 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
     const trackingID = req.query.trackingID;
+    // console.log(trackingID);
 
     const str = "select p.lockerid, p.compid, p.itemname, p.sname, p.rname, p.address, p.city, p.province, c.otp from (select lockerid, compid, itemname, sname, rname, address, city, province, status from parcelfordelivery where ridertrackingid = '" + trackingID + "') as p inner join compartment c on p.lockerid=c.lockerid and p.compid=c.compid where p.status = 'selectionDone'";
 

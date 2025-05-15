@@ -61,10 +61,10 @@ function LockerList() {
         setLoading(true);
         axios.post('http://localhost:4001/L', formData)
             .then(res => {
-                console.log("res is ", res);
+                // console.log("res is ", res);
     
                 if (res.status === 201) { // Correct status for successful insertion
-                    console.log(res.data.message);
+                    // console.log(res.data.message);
                     alert(res.data.message); // Notify user
                     loadData(); // Refresh data
                 }
@@ -88,10 +88,10 @@ function LockerList() {
         axios.get("http://localhost:4002/")
             .then(res => {
                 setData(res.data);
-                //console.log(res.data.rows);
+                //// console.log(res.data.rows);
             })
             .catch(error => {
-                console.log(`Error while fecthing lockers ${error}`);
+                // console.log(`Error while fecthing lockers ${error}`);
             })
             .finally(() => {
                 setLoading(false);
@@ -104,7 +104,7 @@ function LockerList() {
             params: { lockerid: selectedLocker },
         })
             .then(res => {
-                console.log("message", res.data.message);
+                // console.log("message", res.data.message);
                 loadData();
             })
             .catch(err => {
@@ -129,7 +129,7 @@ function LockerList() {
         const data = { ...formData, lockerid: selectedLocker.lockerid };
         axios.put(`http://localhost:4001/L`, data)
             .then(res => {
-                console.log("message", res.data.message);
+                // console.log("message", res.data.message);
                 loadData();
             })
             .catch(err => {

@@ -18,7 +18,7 @@ function ParcelDeliveryDetail() {
         }
         axios.get('http://localhost:4001/parcelToDeliver/Details', { params: value })
             .then(res => {
-                console.log(res.data.rows);
+                // console.log(res.data.rows);
                 setData(res.data.rows);
             })
             .catch(err => {

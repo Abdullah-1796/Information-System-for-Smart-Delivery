@@ -1,18 +1,20 @@
 import express from 'express';
 import db from "../database.js";
+import axios from "axios";
+
 const router = express.Router();
 
 router.put('/', async (req, res) => {
 	const days = req.body.days;
 	let failedDeliveries = 0;
 
-	console.log("Number of days: " + days);
+	// console.log("Number of days: " + days);
 
 	const str = "select parcelid, stampid, lockerid, compid, to_char(creationtime, 'yyyy-mm-dd') as date from parcelfordelivery where status ='parcelPlaced'";
 
 	try {
 		const result = await db.query(str);
-		//console.log(result);
+		//// console.log(result);
 		if (result.rowCount > 0) {
 			for (let i = 0; i < result.rowCount; i++) {
 
@@ -20,7 +22,7 @@ router.put('/', async (req, res) => {
 				const date2 = new Date(Date.now());
 
 				const daysWaited = (date2.getTime() - date1.getTime()) / (24 * 60 * 60 * 1000);
-				console.log("Days delayed: " + daysWaited);
+				// console.log("Days delayed: " + daysWaited);
 				if (daysWaited >= days) {
 					const str1 = "update parcelForDelivery set status = 'failed' where parcelid = " + result.rows[i].parcelid;
 
@@ -32,7 +34,7 @@ router.put('/', async (req, res) => {
 					}
 					await axios.put('http://localhost:4001/updateTimestamp', values)
 						.then(response => {
-							console.log(response.data.message);
+							// console.log(response.data.message);
 						})
 						.catch(err => {
 							console.error("Error while updating status of parcel: " + err);
@@ -46,7 +48,7 @@ router.put('/', async (req, res) => {
 					}
 					axios.put('http://localhost:4002/Locker/Compartment/otp', values1)
 						.then(response => {
-							console.log(response.data.message);
+							// console.log(response.data.message);
 						})
 						.catch(err => {
 							console.error(err);

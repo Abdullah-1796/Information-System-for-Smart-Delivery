@@ -68,14 +68,14 @@ const SelectCompartment = () => {
           marginBottom: "16px",
         }}
       >
-        <button onClick={() => console.log("Go back")}>&larr; Back</button>
+        <button onClick={() => // console.log("Go back")}>&larr; Back</button>
         <h2>Select a Delivery Compartment</h2>
         {parcelDetail && (
           <h3>
             ParcelID: {parcelDetail.parcelid} is {parcelDetail.dimensionid}
           </h3>
         )}
-        <button onClick={() => console.log("Help")}>?</button>
+        <button onClick={() => // console.log("Help")}>?</button>
       </div>
 
       <div style={{ display: "flex", flexDirection: "row" }}>

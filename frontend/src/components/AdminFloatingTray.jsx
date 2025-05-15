@@ -68,13 +68,13 @@ function AdminFloatingTray() {
         axios
             .post("http://localhost:4001/postUpdates", selectedData)
             .then((res) => {
-                console.log(res.data.message);
+                // console.log(res.data.message);
                 if (res.status === 200) {
                     alert(res.data.message);
                 }
             })
             .catch((err) => {
-                console.log(err);
+                // console.log(err);
             });
 
         setShowPopup(false);
@@ -86,7 +86,7 @@ function AdminFloatingTray() {
         axios
             .get("http://localhost:4001/getUpdates")
             .then((res) => {
-                console.log(res.data);
+                // console.log(res.data);
 
                 if (res.status === 200) {
                     const fetchedData = res.data.rows || []; // Extract 'rows' from response
@@ -119,7 +119,7 @@ function AdminFloatingTray() {
                 }
             })
             .catch((err) => {
-                console.log(err);
+                // console.log(err);
                 alert("Error fetching updates!");
             });
     }
@@ -140,13 +140,13 @@ function AdminFloatingTray() {
             axios
                 .put("http://localhost:4001/markFailDeliveries", values)
                 .then((res) => {
-                    console.log(res.data);
+                    // console.log(res.data);
                     if (res.status === 200) {
                         alert(res.data.message);
                     }
                 })
                 .catch((err) => {
-                    console.log(err);
+                    // console.log(err);
                 });
         }
     }
@@ -163,7 +163,7 @@ function AdminFloatingTray() {
             if (response.data.success) {
                 setParcels(response.data.data); // Update state with fetched data
                 setShowtable(true); // Show the table
-                console.log("Data is:", response.data.data);
+                // console.log("Data is:", response.data.data);
             } else {
                 throw new Error(response.data.message || "Failed to fetch data");
             }
@@ -186,7 +186,7 @@ function AdminFloatingTray() {
             if (response.data.success) {
                 setParcels(response.data.data); // Update state with fetched data
                 setShowtable(true); // Show the table
-                // console.log("Data is:", response.data.data);
+                // // console.log("Data is:", response.data.data);
             } else {
                 throw new Error(response.data.message || "Failed to fetch data");
             }
@@ -209,7 +209,7 @@ function AdminFloatingTray() {
             if (response.data.success) {
                 setParcels(response.data.data); // Update state with fetched data
                 setShowtable(true); // Show the table
-                // console.log("Data is:", response.data.data);
+                // // console.log("Data is:", response.data.data);
             } else {
                 throw new Error(response.data.message || "Failed to fetch data");
             }
@@ -244,6 +244,33 @@ function AdminFloatingTray() {
         }
     }
 
+    function markFailPickUps() {
+        setParcels(""); // Update state with fetched data
+        setShowtable(false); // Show the table
+        const days = prompt(
+            "Enter number of days, the parcel has not been picked up:"
+        );
+        if (
+            days &&
+            window.confirm(
+                `Mark parcels as failed deliveries if not picked up in ${days} days?`
+            )
+        ) {
+            const values = { days: days };
+            axios
+                .put("http://localhost:4001/markFailpickups", values)
+                .then((res) => {
+                    // console.log(res.data);
+                    if (res.status === 200) {
+                        alert(res.data.message);
+                    }
+                })
+                .catch((err) => {
+                    // console.log(err);
+                });
+        }
+    }
+
     return (
         <div id="tray-outer-container">
             <div id="toggle-btn" onClick={toggleTray}>
@@ -259,42 +286,54 @@ function AdminFloatingTray() {
                             link=""
                         />
                     </div>
-                    <Option
-                        backgroundColor="#697565"
-                        color="white"
-                        label="Old Admin Home"
-                        link="/AdminHomeOld"
-                    />
-                    <Option
-                        backgroundColor="#697565"
-                        color="white"
-                        label="Get Updated Parcels"
-                        link=""
-                    />
-                    <Option
-                        backgroundColor="#3C3D37"
-                        color="white"
-                        label="Mark Fail Deliveries"
-                        link=""
-                    />
-                    <Option
-                        backgroundColor="#123458"
-                        color="white"
-                        label="Get Pending Parcels"
-                        link=""
-                    />
-                    <Option
-                        backgroundColor="#EDE8DC"
-                        color="black"
-                        label="Placed in Box"
-                        link=""
-                    />
-                    <Option
-                        backgroundColor="#1E201E"
-                        color="white"
-                        label="Parcels Delivered"
-                        link=""
-                    />
+                    <div onClick={getUpdates}>
+                        <Option
+                            backgroundColor="#697565"
+                            color="white"
+                            label="Get Updated Parcels"
+                            link=""
+                        />
+                    </div>
+                    <div onClick={markFailDeliveries}>
+                        <Option
+                            backgroundColor="#3C3D37"
+                            color="white"
+                            label="Mark Fail Deliveries"
+                            link=""
+                        />
+                    </div>
+                    <div onClick={getPendingParcels}>
+                        <Option
+                            backgroundColor="#123458"
+                            color="white"
+                            label="Get Pending Parcels"
+                            link=""
+                        />
+                    </div>
+                    <div onClick={getPlacedParcels}>
+                        <Option
+                            backgroundColor="#EDE8DC"
+                            color="black"
+                            label="Placed in Box"
+                            link=""
+                        />
+                    </div>
+                    <div onClick={getDeliveredParcels}>
+                        <Option
+                            backgroundColor="#1E201E"
+                            color="white"
+                            label="Parcels Delivered"
+                            link=""
+                        />
+                    </div>
+                    <div onClick={markFailPickUps}>
+                        <Option
+                            backgroundColor="#123458"
+                            color="white"
+                            label="Mark Fail Pickups"
+                            link=""
+                        />
+                    </div>
                 </div>
             </div>
         </div>

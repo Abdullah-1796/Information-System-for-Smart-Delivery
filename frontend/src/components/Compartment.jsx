@@ -12,7 +12,7 @@ function Compartment(props) {
             params: { lockerid: selectedComp },
         })
             .then(res => {
-                console.log("message", res.data.message);
+                // console.log("message", res.data.message);
                 props.loadData()
             })
             .catch(err => {
