@@ -1,83 +1,86 @@
 #select-locker-container {
-    width: 100;
-    height: 100vh;
-	background-image: url('../../public/images/gradient1.png');
+    width: 100%;
+    min-height: 100vh;
+    background-image: url('../../public/images/gradient1.png');
+    background-size: cover;
+    background-position: center;
+    padding: 2% 5%;
+    box-sizing: border-box;
 }
 
 #select-locker-container h1 {
     font-family: 'Pacifico', cursive;
-    margin: 0 2%;
-    font-size: 300%;
+    font-size: 2.5rem;
+    margin-bottom: 2%;
+    text-align: center;
 }
 
-#trackingID-input {
+#trackingID-input1 {
     display: flex;
-    margin: 0 20%;
+    flex-direction: row;
+    flex-wrap: wrap;
     background-color: #123458;
-    padding: 0.5%;
+    padding: 1%;
     gap: 1%;
     justify-content: center;
     align-items: center;
     border-radius: 30px;
     box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    margin: 0 auto 2%;
+    max-width: 800px;
 }
 
-#trackingID-input > #button {
+#trackingID-input1 > #button {
     width: 30%;
-    height: 60px;
+    min-width: 120px;
+    height: 50px;
     display: flex;
-    margin: 0;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     border-radius: 25px;
     font-weight: bold;
     background-color: #EDE8DC;
+    padding: 0 10px;
+    text-align: center;
 }
 
-#trackingID-input > input {
-    margin: 0;
+#trackingID-input1 > input {
+    flex: 1;
     height: 40px;
     border-radius: 25px;
-    font-size: large;
+    font-size: 1rem;
     padding-left: 2%;
+    min-width: 150px;
 }
 
 #select-locker {
-    background-color: antiquewhite;
-    margin: 2%;
-    padding: 2%;
-    height: 73%;
-	background-color: rgba(255, 255, 255, 0.585);
-	backdrop-filter: blur(30px);
+    background-color: rgba(255, 255, 255, 0.585);
+    backdrop-filter: blur(30px);
     border-radius: 30px;
+    padding: 2%;
+    margin-top: 2%;
 }
 
 #select-locker h1 {
-    font-size: 200%;
-    padding: 0;
-    margin-top: 1%;
-    margin-bottom: 1%;
+    font-size: 1.8rem;
+    text-align: center;
     font-weight: 500;
+    margin: 1% 0;
 }
 
 #locker-list {
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-start;
-    align-items: flex-start;
+    justify-content: center;
+    gap: 1rem;
     overflow-x: auto;
-    height: 70%;
-    /* background-color: #123458; */
-    border-radius: 25px;
+    padding: 1%;
+    height: auto;
 }
 
 #locker-list::-webkit-scrollbar {
-    width: 5px;
-}
-
-#locker-list::-webkit-scrollbar-track {
-    background: transparent;
+    height: 5px;
 }
 
 #locker-list::-webkit-scrollbar-thumb {
@@ -86,7 +89,8 @@
 }
 
 #locker-option {
-    width: 420px;
+    flex: 1 1 320px;
+    max-width: 420px;
     display: flex;
     background-color: #A5B68D;
     border-radius: 25px;
@@ -97,10 +101,107 @@
 }
 
 #locker-option img {
-    width: 120px;
+    width: 100px;
+    height: auto;
     border-radius: 25px;
 }
 
 #locker-option #detail {
     margin-left: 10px;
+    flex: 1;
 }
+
+/* Media Queries for Mobile */
+@media (max-width: 768px) {
+    #trackingID-input1 {
+        flex-direction: column;
+        padding: 2%;
+        margin: 0;
+    }
+
+    #trackingID-input1 > #button {
+        width: 95%;
+        margin-top: 10px;
+    }
+
+    #locker-option {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    #locker-option img {
+        width: 80%;
+        margin-bottom: 10px;
+    }
+
+    #locker-option #detail {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    #select-locker-container {
+        padding: 5% 4%;
+    }
+
+    #select-locker-container h1 {
+        font-size: 1.8rem;
+        margin-bottom: 1.2rem;
+    }
+
+    #trackingID-input1 {
+        flex-direction: column;
+        padding: 5%;
+        gap: 10px;
+        /* margin: 0 auto 1.5rem; */
+        width: 90%;
+        max-width: 100%;
+        margin: 0;
+    }
+
+    #trackingID-input1 input {
+        width: 75%;
+        font-size: 1rem;
+        padding: 10px;
+        margin: 0;
+    }
+
+    #trackingID-input1 #button {
+        width: 75%;
+        height: 45px;
+        font-size: 1rem;
+    }
+
+    #select-locker {
+        padding: 4%;
+        margin: 0;
+    }
+
+    #locker-list {
+        flex-direction: column;
+        gap: 1rem;
+        height: auto;
+        padding: 0;
+    }
+
+    #locker-option {
+        flex-direction: column;
+        width: 100%;
+        max-width: 100%;
+        padding: 1rem;
+        align-items: center;
+    }
+
+    #locker-option img {
+        width: 80%;
+        height: auto;
+        margin-bottom: 10px;
+    }
+
+    #locker-option #detail {
+        text-align: center;
+        margin-left: 0;
+    }
+}
+

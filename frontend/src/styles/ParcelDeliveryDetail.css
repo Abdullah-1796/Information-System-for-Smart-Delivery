@@ -1,84 +1,169 @@
 #delivery-detail-container {
-    width: 100;
+    width: 100%;
     height: 100vh;
-	background-image: url('../../public/images/gradient1.png');
+    background-image: url('../../public/images/gradient1.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    padding: 2% 5%;
+    box-sizing: border-box;
 }
 
 #delivery-detail-container h1 {
     font-family: 'Pacifico', cursive;
     margin: 0 2%;
-    font-size: 300%;
+    font-size: 2.5rem;
+    text-align: center;
 }
 
+/* Tracking input section (updated) */
 #trackingID-input {
     display: flex;
-    margin: 0 20%;
+    flex-direction: row;
+    flex-wrap: wrap;
     background-color: #123458;
-    padding: 0.5%;
+    padding: 1%;
     gap: 1%;
     justify-content: center;
     align-items: center;
     border-radius: 30px;
     box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    margin: 0 auto 2%;
+    max-width: 800px;
+    width: 100%;
+}
+
+#trackingID-input > input {
+    flex: 1;
+    height: 40px;
+    border-radius: 15px;
+    font-size: 1rem;
+    padding-left: 2%;
+    min-width: 150px;
+    border: none;
+    outline: none;
 }
 
 #trackingID-input > #button {
     width: 30%;
-    height: 60px;
+    min-width: 120px;
+    height: 50px;
     display: flex;
-    margin: 0;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    border-radius: 25px;
+    border-radius: 15px;
     font-weight: bold;
     background-color: #EDE8DC;
+    padding: 0 10px;
+    text-align: center;
 }
 
-#trackingID-input > input {
-    margin: 0;
-    height: 40px;
-    border-radius: 25px;
-    font-size: large;
-    padding-left: 2%;
-}
-
+/* Delivery detail section */
 #delivery-detail {
-    background-color: antiquewhite;
-    margin: 2%;
-    padding: 2%;
-    height: 73%;
-	background-color: rgba(255, 255, 255, 0.585);
-	backdrop-filter: blur(30px);
+    background-color: rgba(255, 255, 255, 0.585);
+    backdrop-filter: blur(30px);
     border-radius: 30px;
+    margin: 2% auto;
+    padding: 2%;
+    width: 90%;
+    max-width: 1000px;
+    box-sizing: border-box;
 }
 
 #delivery-detail h1 {
-    font-size: 200%;
-    padding: 0;
-    margin-top: 1%;
-    margin-bottom: 1%;
+    font-size: 1.8rem;
+    margin: 1% 0;
     font-weight: 500;
+    text-align: center;
 }
 
 #detail-list {
     display: flex;
     flex-wrap: wrap;
-    font-size: larger;
+    font-size: 1.1rem;
     justify-content: space-around;
     align-items: center;
-    height: 70%;
+    gap: 1rem;
+    padding: 1%;
 }
 
 #detail-list h3 {
     display: flex;
     justify-content: center;
-    width: 400px;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
     background-color: #E7CCCC;
     border-radius: 15px;
-    padding: 25px 10px;
+    padding: 20px 10px;
     margin: 1%;
     cursor: pointer;
-    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
-    box-shadow:  rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+    text-align: center;
+    box-shadow: rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+}
+
+/* ========== Media Queries ========== */
+@media (max-width: 768px) {
+    #delivery-detail-container h1 {
+        font-size: 2rem;
+    }
+
+    #trackingID-input {
+        flex-direction: column;
+        padding: 2%;
+        margin: 0;
+    }
+
+    #trackingID-input > #button {
+        width: 95%;
+        margin-top: 10px;
+    }
+
+    #delivery-detail h1 {
+        font-size: 1.5rem;
+    }
+
+    #detail-list h3 {
+        font-size: 1rem;
+        padding: 15px 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    #delivery-detail-container h1 {
+        font-size: 1.6rem;
+    }
+
+    #trackingID-input {
+        flex-direction: column;
+        padding: 5%;
+        gap: 10px;
+        width: 90%;
+        max-width: 100%;
+        margin: 0;
+    }
+
+    #trackingID-input input {
+        width: 75%;
+        font-size: 1rem;
+        padding: 10px;
+        margin: 0;
+    }
+
+    #trackingID-input #button {
+        width: 75%;
+        height: 45px;
+        font-size: 1rem;
+    }
+
+    #delivery-detail h1 {
+        font-size: 1.3rem;
+    }
+
+    #detail-list h3 {
+        font-size: 0.95rem;
+        padding: 12px 6px;
+        width: 90%;
+    }
 }

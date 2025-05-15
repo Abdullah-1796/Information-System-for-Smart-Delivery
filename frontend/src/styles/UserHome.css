@@ -5,7 +5,7 @@
 }
 
 #userHome-container {
-	background-image: url('../../public/images/gradient1.png');
+    background-image: url('../../public/images/gradient1.png');
     background-repeat: no-repeat;
     background-size: cover;
     margin: 0;
@@ -22,19 +22,23 @@
 
 .goal-container {
     display: flex;
+    flex-direction: row;
     background-color: #E7CCCC;
     border-radius: 35px;
     box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
     margin-bottom: 5%;
+    flex-wrap: wrap;
+}
+
+.goal-container.reverse {
+    flex-direction: row-reverse;
 }
 
 #userHome-container .img {
-    width: 650px;
+    flex: 1 1 300px;
     margin: 2%;
-    /* background-color: blue; */
     display: flex;
     align-items: center;
-
 }
 
 #userHome-container img {
@@ -44,6 +48,7 @@
 }
 
 .detail {
+    flex: 1 1 300px;
     font-size: 135%;
     margin: 2%;
     font-family: "", sans-serif;
@@ -60,6 +65,42 @@
     margin-bottom: 2%;
 }
 
-.reverse {
-    flex-direction: row-reverse;
+/* Media Queries for responsiveness */
+@media (max-width: 768px) {
+    #userHome-container h1 {
+        font-size: 200%;
+        text-align: center;
+        margin: 4% 0;
+    }
+
+    .goal-container,
+    .goal-container.reverse {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #userHome-container .img,
+    .detail {
+        flex: 1 1 100%;
+        margin: 4% 0;
+    }
+
+    .detail {
+        font-size: 110%;
+        text-align: center;
+    }
+
+    #userHome-container .heading {
+        font-size: 180%;
+    }
+}
+
+@media (max-width: 480px) {
+    .detail {
+        font-size: 100%;
+    }
+
+    #userHome-container .heading {
+        font-size: 150%;
+    }
 }

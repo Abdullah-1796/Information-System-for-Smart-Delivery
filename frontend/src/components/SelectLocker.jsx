@@ -74,7 +74,7 @@ function SelectLocker() {
             <CustomerCareButton />
             <h1>Smart Delivery</h1>
             <div id="select-locker">
-                <div id="trackingID-input">
+                <div id="trackingID-input1">
                     <input type="text" placeholder="Enter Receiver Tracking ID" name="id" value={trackingID} onChange={handleTrackingID} />
                     <div id="button" onClick={findLockers}>Find Lockers</div>
                 </div>

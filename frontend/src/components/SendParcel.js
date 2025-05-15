@@ -204,6 +204,7 @@ const SendParcel = () => {
                 value={formData.country}
                 onChange={handleChange}
                 required
+                style={{ width: "100%" }}
                 className="form-select"
               >
                 <option value="">Select Country</option>
@@ -223,6 +224,7 @@ const SendParcel = () => {
                 onChange={handleChange}
                 required
                 disabled={!formData.country}
+                style={{ width: "100%" }}
                 className="form-select"
               >
                 <option value="">Select Province</option>
@@ -242,6 +244,7 @@ const SendParcel = () => {
                 onChange={handleChange}
                 required
                 disabled={!formData.province}
+                style={{ width: "100%" }}
                 className="form-select"
               >
                 <option value="">Select City</option>
@@ -254,6 +257,9 @@ const SendParcel = () => {
             </div>
 
             <div className="form-navigation">
+              <div type="button" onClick={prevSection}>
+                
+              </div>
               <button type="button" className="next-btn" onClick={nextSection}>
                 Next: Parcel Details
               </button>
