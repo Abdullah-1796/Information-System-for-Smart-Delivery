@@ -1,7 +1,10 @@
 #userHome-container h1 {
     font-family: "", cursive;
     font-size: 300%;
-    margin: 0 0 0 2%;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    margin: 0 0 0 1%;
 }
 
 #userHome-container {
@@ -35,7 +38,7 @@
 }
 
 #userHome-container .img {
-    flex: 1 1 300px;
+    flex: 0 1 300px;
     margin: 2%;
     display: flex;
     align-items: center;
@@ -81,8 +84,8 @@
 
     #userHome-container .img,
     .detail {
-        flex: 1 1 100%;
-        margin: 4% 0;
+        flex: 1 1 50%;
+        margin: 4% 4%;
     }
 
     .detail {

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "../styles/FloatingTray.css";
 import Option from "./Option";
 import axios from "axios";
+import ParcelModal from "./ParcelModal";
 
 
 function AdminFloatingTray() {
@@ -46,6 +47,7 @@ function AdminFloatingTray() {
     const [error, setError] = useState(null); // State to handle errors
     const [showtable, setShowtable] = useState(false);
     const [status, setStatus] = useState("pending");
+    const [title, setTitle] = useState("Parcel Details");
     function handleCheckboxChange(index) {
         const updatedData = [...data];
         updatedData[index].selected = !updatedData[index].selected;
@@ -83,6 +85,7 @@ function AdminFloatingTray() {
     function getUpdates() {
         setParcels(""); // Update state with fetched data
         setShowtable(false); // Show the table
+        setLoading(true); // Set loading to true
         axios
             .get("http://localhost:4001/getUpdates")
             .then((res) => {
@@ -98,6 +101,9 @@ function AdminFloatingTray() {
                     setParcels(fetchedData); // Update state with fetched data
                     setShowtable(true); // Show the table
                     // Format data properly for confirmation popup
+                    setLoading(false); // Set loading to false
+                    setTitle("Parcels To Deliver");
+                    setShowPopup(true);
                     const formattedData = fetchedData
                         .map(
                             (item, index) =>
@@ -164,6 +170,8 @@ function AdminFloatingTray() {
                 setParcels(response.data.data); // Update state with fetched data
                 setShowtable(true); // Show the table
                 // console.log("Data is:", response.data.data);
+                setTitle("Pending Parcels");
+                setShowPopup(true); // Show the popup
             } else {
                 throw new Error(response.data.message || "Failed to fetch data");
             }
@@ -187,6 +195,8 @@ function AdminFloatingTray() {
                 setParcels(response.data.data); // Update state with fetched data
                 setShowtable(true); // Show the table
                 // // console.log("Data is:", response.data.data);
+                setTitle("Placed Parcels");
+                setShowPopup(true); // Show the popup
             } else {
                 throw new Error(response.data.message || "Failed to fetch data");
             }
@@ -209,7 +219,9 @@ function AdminFloatingTray() {
             if (response.data.success) {
                 setParcels(response.data.data); // Update state with fetched data
                 setShowtable(true); // Show the table
-                // // console.log("Data is:", response.data.data);
+                // console.log("Data is:", response.data.data);
+                setTitle("Delivered Parcels");
+                setShowPopup(true); // Show the popup
             } else {
                 throw new Error(response.data.message || "Failed to fetch data");
             }
@@ -238,7 +250,7 @@ function AdminFloatingTray() {
             tray.style.display = "flex";
             void tray.offsetWidth;
             tray.classList.remove("hidden");
-            btn.style.bottom = "23%";
+            btn.style.bottom = "25%";
             img.src = "./images/down arrow.png";
             setVisible(true);
         }
@@ -272,71 +284,83 @@ function AdminFloatingTray() {
     }
 
     return (
-        <div id="tray-outer-container">
-            <div id="toggle-btn" onClick={toggleTray}>
-                <img src="./images/down arrow.png" alt="Down Arrow Icon" id="toggle-btn-img" />
-            </div>
-            <div id="floating-tray-container">
-                <div id="floating-tray">
-                    <div onClick={confirmPostUpdates}>
-                        <Option
-                            backgroundColor="#1E201E"
-                            color="white"
-                            label="Post Parcels"
-                            link=""
-                        />
-                    </div>
-                    <div onClick={getUpdates}>
-                        <Option
-                            backgroundColor="#697565"
-                            color="white"
-                            label="Get Updated Parcels"
-                            link=""
-                        />
-                    </div>
-                    <div onClick={markFailDeliveries}>
-                        <Option
-                            backgroundColor="#3C3D37"
-                            color="white"
-                            label="Mark Fail Deliveries"
-                            link=""
-                        />
-                    </div>
-                    <div onClick={getPendingParcels}>
-                        <Option
-                            backgroundColor="#123458"
-                            color="white"
-                            label="Get Pending Parcels"
-                            link=""
-                        />
-                    </div>
-                    <div onClick={getPlacedParcels}>
-                        <Option
-                            backgroundColor="#EDE8DC"
-                            color="black"
-                            label="Placed in Box"
-                            link=""
-                        />
-                    </div>
-                    <div onClick={getDeliveredParcels}>
-                        <Option
-                            backgroundColor="#1E201E"
-                            color="white"
-                            label="Parcels Delivered"
-                            link=""
-                        />
-                    </div>
-                    <div onClick={markFailPickUps}>
-                        <Option
-                            backgroundColor="#123458"
-                            color="white"
-                            label="Mark Fail Pickups"
-                            link=""
-                        />
-                    </div>
-                </div>
-            </div>
+      <div id="tray-outer-container">
+        <div id="toggle-btn" onClick={toggleTray}>
+          <img
+            src="./images/down arrow.png"
+            alt="Down Arrow Icon"
+            id="toggle-btn-img"
+          />
         </div>
+        {showPopup && (
+          <ParcelModal
+            parcels={parcels}
+            onClose={() => setShowPopup(false)}
+            title={title}
+          />
+        )}
+
+        <div id="floating-tray-container">
+          <div id="floating-tray">
+            <div onClick={confirmPostUpdates}>
+              <Option
+                backgroundColor="#1E201E"
+                color="white"
+                label="Post Parcels"
+                link=""
+              />
+            </div>
+            <div onClick={getUpdates}>
+              <Option
+                backgroundColor="#697565"
+                color="white"
+                label="Get Updated Parcels"
+                link=""
+              />
+            </div>
+            <div onClick={markFailDeliveries}>
+              <Option
+                backgroundColor="#3C3D37"
+                color="white"
+                label="Mark Fail Deliveries"
+                link=""
+              />
+            </div>
+            <div onClick={getPendingParcels}>
+              <Option
+                backgroundColor="#123458"
+                color="white"
+                label="Get Pending Parcels"
+                link=""
+              />
+            </div>
+            <div onClick={getPlacedParcels}>
+              <Option
+                backgroundColor="#EDE8DC"
+                color="black"
+                label="Placed in Box"
+                link=""
+              />
+            </div>
+            <div onClick={getDeliveredParcels}>
+              <Option
+                backgroundColor="#1E201E"
+                color="white"
+                label="Parcels Delivered"
+                link=""
+              />
+            </div>
+            <div onClick={markFailPickUps}>
+              <Option
+                backgroundColor="#123458"
+                color="white"
+                label="Mark Fail Pickups"
+                link=""
+              />
+            </div>
+          </div>
+        </div>
+      </div>
     );
 }
 

@@ -23,7 +23,7 @@ function UserFloatingTray() {
             tray.style.display = "flex";
             void tray.offsetWidth;
             tray.classList.remove("hidden");
-            btn.style.bottom = "23%";
+            btn.style.bottom = "25%";
             img.src = "./images/down arrow.png";
             setVisible(true);
         }
